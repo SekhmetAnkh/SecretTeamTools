@@ -6,20 +6,22 @@ const excludedWallets = [
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme) {
     document.body.classList.toggle('dark-mode', savedTheme === 'dark');
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.checked = savedTheme === 'dark';
-    }
 }
 
-// Toggle dark mode on switch (works for both pages)
+// Toggle dark mode on button click
 const themeToggle = document.getElementById('themeToggle');
 if (themeToggle) {
     themeToggle.onclick = () => {
         document.body.classList.toggle('dark-mode');
         const newTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
         localStorage.setItem('theme', newTheme); // Save user preference
+        
+        // Change icon based on theme
+        themeToggle.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙'; // Sun for dark mode, moon for light mode
     };
+
+    // Set initial icon based on saved theme
+    themeToggle.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
 }
 
 // Wallet checker functionality
