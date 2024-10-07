@@ -6,14 +6,16 @@ const excludedWallets = [
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme) {
     document.body.classList.toggle('dark-mode', savedTheme === 'dark');
-    if (document.getElementById('themeToggle')) {
-        document.getElementById('themeToggle').checked = savedTheme === 'dark';
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.checked = savedTheme === 'dark';
     }
 }
 
 // Toggle dark mode on switch (works for both pages)
-if (document.getElementById('themeToggle')) {
-    document.getElementById('themeToggle').onclick = () => {
+const themeToggle = document.getElementById('themeToggle');
+if (themeToggle) {
+    themeToggle.onclick = () => {
         document.body.classList.toggle('dark-mode');
         const newTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
         localStorage.setItem('theme', newTheme); // Save user preference
