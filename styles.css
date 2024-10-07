@@ -1,34 +1,37 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #f4f4f4; /* Light background */
     margin: 0;
     padding: 20px;
-    transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
 }
 
-body.dark-mode {
-    background-color: #121212; /* Dark background */
-    color: #ffffff; /* Light text */
+.dark-mode {
+    background-color: #333; /* Dark background */
+    color: #f4f4f4; /* Light text color */
 }
 
 .container {
     max-width: 600px;
     margin: auto;
-    background: white;
+    background: white; /* Light background for container */
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s; /* Smooth transition */
+    transition: background-color 0.3s; /* Smooth transition for container */
 }
 
-.container.dark-mode {
-    background: #1e1e1e; /* Darker container */
-    border: 1px solid #444; /* Dark border */
+.dark-mode .container {
+    background: #444; /* Dark background for container */
 }
 
 h1 {
     text-align: center;
     color: #333;
+}
+
+.dark-mode h1 {
+    color: #f4f4f4; /* Light text for heading in dark mode */
 }
 
 input {
@@ -39,6 +42,12 @@ input {
     border-radius: 4px;
 }
 
+.dark-mode input {
+    border-color: #666; /* Darker border in dark mode */
+    background-color: #555; /* Dark background for input */
+    color: #f4f4f4; /* Light text for input */
+}
+
 button {
     width: 100%;
     padding: 10px;
@@ -47,11 +56,14 @@ button {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s; /* Smooth transition */
 }
 
 button:hover {
     background-color: #218838;
+}
+
+.dark-mode button {
+    background-color: #1e7e34; /* Darker green for button in dark mode */
 }
 
 .results, .exclusions {
@@ -63,18 +75,6 @@ button:hover {
     color: #555;
 }
 
-#themeToggle {
-    cursor: pointer;
-    background: none;
-    border: none;
-    font-size: 24px;
-    transition: color 0.3s;
-}
-
-#themeToggle:hover {
-    color: #555;
-}
-
-.dark-mode #themeToggle {
-    color: #FFD700; /* Gold for sun in dark mode */
+.dark-mode .results p, .dark-mode .exclusions p {
+    color: #ddd; /* Lighter text for results in dark mode */
 }
