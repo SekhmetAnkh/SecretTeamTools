@@ -2,6 +2,20 @@ const excludedWallets = [
     "0xE18F094DDd37f0eB2b651b65C4Aad080aFe90e51"
 ];
 
+// Check for saved theme preference on load
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+    document.body.classList.toggle('dark-mode', savedTheme === 'dark');
+    document.getElementById('themeToggle').checked = savedTheme === 'dark';
+}
+
+// Toggle dark mode on switch
+document.getElementById('themeToggle').onclick = () => {
+    document.body.classList.toggle('dark-mode');
+    const newTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+    localStorage.setItem('theme', newTheme); // Save user preference
+};
+
 document.getElementById('checkButton').onclick = async () => {
     const walletAddress = document.getElementById('walletAddress').value;
     const resultsDiv = document.getElementById('results');
