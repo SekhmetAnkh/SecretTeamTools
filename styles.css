@@ -54,15 +54,6 @@ button:hover {
     background-color: #218838;
 }
 
-button.dark-mode {
-    background-color: #555; /* Dark button */
-    color: white; /* Light button text */
-}
-
-button.dark-mode:hover {
-    background-color: #666; /* Dark button hover */
-}
-
 .results, .exclusions {
     margin-top: 20px;
 }
@@ -72,7 +63,18 @@ button.dark-mode:hover {
     color: #555;
 }
 
-label {
-    display: block;
-    margin-top: 20px;
+#themeToggle {
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 24px;
+    transition: color 0.3s;
+}
+
+#themeToggle:hover {
+    color: #555;
+}
+
+.dark-mode #themeToggle {
+    color: #FFD700; /* Gold for sun in dark mode */
 }
