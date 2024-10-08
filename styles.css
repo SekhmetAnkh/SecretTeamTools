@@ -2,7 +2,11 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4; /* Light background */
     margin: 0;
-    padding: 20px;
+    padding: 0; /* Remove default padding */
+    height: 100vh; /* Full height of the viewport */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
     transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
 }
 
@@ -14,7 +18,8 @@ body {
 .container {
     position: relative; /* Add relative positioning */
     max-width: 600px;
-    margin: auto;
+    width: 100%; /* Make the container responsive */
+    margin: 20px; /* Add margin for smaller screens */
     background: white; /* Light background for container */
     padding: 20px;
     border-radius: 8px;
