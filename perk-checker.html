@@ -56,10 +56,15 @@
             }
 
             const perks = parsePerkList(perkListInput);
-            const activePerksOnDate = getActivePerks(perks, checkDate);
-            const activePerksToday = getActivePerks(perks, new Date());
 
-            displayResults(activePerksOnDate, activePerksToday, checkDate);
+            try {
+                const activePerksOnDate = getActivePerks(perks, checkDate);
+                const activePerksToday = getActivePerks(perks, new Date());
+
+                displayResults(activePerksOnDate, activePerksToday, checkDate);
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
+            }
         }
 
         function parsePerkList(input) {
@@ -84,25 +89,25 @@
         }
 
         function getActivePerks(perks, date) {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);  // Set to start of today
+
+            // If the date is in the future, return an error
+            if (date > now) {
+                throw new Error("Future date selected. Please choose a date in the past or today.");
+            }
+
             // Sort perks by createdAt date in descending order
             perks.sort((a, b) => b.createdAt - a.createdAt);
 
-            // Find active perks for the given date
+            // For past dates and today, find the applicable perk entry
             for (let i = 0; i < perks.length; i++) {
                 if (perks[i].createdAt <= date && perks[i].updatedAt >= date) {
                     return perks[i].perks;
                 }
             }
 
-            // If no active perks found and the date is today or in the future, 
-            // return the most recent 'active' status perks
-            if (date >= new Date().setHours(0,0,0,0)) {
-                const activePerkEntry = perks.find(perk => perk.status.toLowerCase() === 'active');
-                if (activePerkEntry) {
-                    return activePerkEntry.perks;
-                }
-            }
-
+            // If no perks found for the given date
             return [];
         }
 
