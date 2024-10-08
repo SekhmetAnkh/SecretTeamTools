@@ -30,12 +30,12 @@
 
         <div class="input-group">
             <label for="wallet-input">Wallet Address or Etherscan URL:</label>
-            <input type="text" id="wallet-input" placeholder="Enter wallet address or Etherscan URL" style="width: 100%; box-sizing: border-box;">
+            <input type="text" id="wallet-input" placeholder="Enter wallet address or Etherscan URL">
         </div>
         <div class="input-group">
-            <button onclick="analyzeWallet()">Analyze Wallet</button>
+            <button onclick="analyzeWallet()" class="btn-primary">Analyze Wallet</button>
         </div>
-        <div id="result"></div>
+        <div id="result" class="result-card"></div>
     </div>
 
     <script src="load-navbar.js"></script>
