@@ -4,37 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLU Wallet Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #ffffff;
+            --bg-color: #f4f7f9;
             --text-color: #333333;
-            --input-bg: #f0f0f0;
+            --input-bg: #ffffff;
             --input-text: #333333;
-            --button-bg: #4CAF50;
+            --button-bg: #3498db;
             --button-text: #ffffff;
+            --accent-color: #2ecc71;
         }
 
         [data-theme="dark"] {
-            --bg-color: #333333;
-            --text-color: #ffffff;
-            --input-bg: #555555;
-            --input-text: #ffffff;
-            --button-bg: #45a049;
+            --bg-color: #2c3e50;
+            --text-color: #ecf0f1;
+            --input-bg: #34495e;
+            --input-text: #ecf0f1;
+            --button-bg: #3498db;
             --button-text: #ffffff;
+            --accent-color: #2ecc71;
         }
 
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             line-height: 1.6;
             color: var(--text-color);
             background-color: var(--bg-color);
             padding: 20px;
             transition: all 0.3s ease;
+            margin: 0;
         }
 
-        /* ... (keep other styles, updating colors to use CSS variables) ... */
+        h1 {
+            text-align: center;
+            color: var(--text-color);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--input-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
 
         .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
             background-color: var(--input-bg);
             color: var(--input-text);
         }
@@ -42,26 +75,104 @@
         .input-group button {
             background-color: var(--button-bg);
             color: var(--button-text);
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
         }
 
-        /* ... (keep other styles, updating colors to use CSS variables) ... */
+        .input-group button:hover {
+            background-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: var(--input-bg);
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            position: relative;
+            width: 60px;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .theme-switch-wrapper em {
+            margin-left: 10px;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
-    <div class="theme-switch">
-        <label for="theme-toggle">Dark Mode</label>
-        <label class="switch">
-            <input type="checkbox" id="theme-toggle">
-            <span class="slider"></span>
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider"></div>
         </label>
+        <em>Dark Mode</em>
     </div>
 
     <h1>PLU Wallet Analyzer</h1>
-    <div class="input-group">
-        <input type="text" id="addressInput" placeholder="Enter Ethereum address or Etherscan link">
-        <button onclick="analyzeWallet()">Analyze</button>
+
+    <div class="container">
+        <div class="input-group">
+            <label for="wallet-address">Wallet Address:</label>
+            <input type="text" id="wallet-address" placeholder="Enter wallet address">
+        </div>
+        <div class="input-group">
+            <button onclick="analyzeWallet()">Analyze Wallet</button>
+        </div>
+        <div id="result"></div>
     </div>
-    <div id="result"></div>
 
     <script>
         const PLU_CONTRACT_ADDRESS = '0xD8912C10681D8B21Fd3742244f44658dBA12264E';
@@ -69,7 +180,7 @@
         const ETHERSCAN_API_KEY = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH';
 
         async function analyzeWallet() {
-            const input = document.getElementById('addressInput').value;
+            const input = document.getElementById('wallet-address').value;
             const address = extractAddress(input);
             
             if (!address) {
@@ -133,7 +244,7 @@
         }
 
         // Theme switcher
-        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggle = document.getElementById('checkbox');
         themeToggle.addEventListener('change', () => {
             document.body.setAttribute('data-theme', themeToggle.checked ? 'dark' : 'light');
             localStorage.setItem('theme', themeToggle.checked ? 'dark' : 'light');
