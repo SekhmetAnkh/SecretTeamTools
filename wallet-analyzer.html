@@ -3,121 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-    <title>PLU Wallet Analyzer</title>
+    <title>Wallet Analyzer</title>
 </head>
 <body>
-    <nav class="navbar">
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="wallet-analyzer.html">PLU Wallet Analyzer</a></li>
-            <li><a href="#">Price Checker (Coming Soon)</a></li>
-            <li><a href="#">Perks Checker (Coming Soon)</a></li>
-            <li>
-                <button id="darkModeToggle" aria-label="Toggle dark mode">
-                    <span id="darkModeIcon" class="moon-icon">&#9790;</span>
-                </button>
-            </li>
-        </ul>
-    </nav>
-    
-    <div class="container">
-        <h1>PLU Wallet Analyzer</h1>
-        <input type="text" id="walletAddress" placeholder="Enter Wallet Address or Etherscan Link">
-        <button id="checkButton">Analyze Wallet</button>
-        
-        <div id="results" class="results"></div>
-        
-        <div id="currentBalance" class="current-balance"></div>
+    <h1>Wallet Analyzer</h1>
+    <form id="walletForm">
+        <label for="walletAddress">Enter Wallet Address or Etherscan Link:</label>
+        <input type="text" id="walletAddress" required>
+        <button type="submit">Analyze</button>
+    </form>
+    <div id="results">
+        <p id="withdrawnPLU"></p>
+        <p id="soldPLU"></p>
+        <p id="percentageSold"></p>
+        <p id="redeemedPLU"></p>
     </div>
 
     <script>
-        const excludedWallets = [
-            "0xE18F094DDd37f0eB2b651b65C4Aad080aFe90e51"
-        ];
+        document.getElementById('walletForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const walletAddress = document.getElementById('walletAddress').value;
+            await analyzeWallet(walletAddress);
+        });
 
-        document.getElementById('checkButton').onclick = async () => {
-            const walletInput = document.getElementById('walletAddress').value;
-            const resultsDiv = document.getElementById('results');
-            const balanceDiv = document.getElementById('currentBalance');
-            resultsDiv.innerHTML = '';
-            balanceDiv.innerHTML = '';
-
-            // Extract wallet address from Etherscan link if necessary
-            const walletAddress = walletInput.startsWith('https://etherscan.io/address/')
-                ? walletInput.split('/').pop() // Extract the last part of the URL
-                : walletInput.trim(); // Trim whitespace for direct addresses
-
+        async function analyzeWallet(walletAddress) {
             try {
-                // Fetch PLU transaction data from Etherscan
-                const response = await fetch(`https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=0xD8912C10681D8B21Fd3742244f44658dBA12264E&address=${walletAddress}&apikey=USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH`);
-                const data = await response.json();
+                const withdrawnPLU = await fetchWithdrawnPLU(walletAddress);
+                const soldPLU = await fetchSoldPLU(walletAddress);
+                const redeemedPLU = await fetchRedeemedPLU(walletAddress);
+                
+                const percentageSold = ((soldPLU / withdrawnPLU) * 100).toFixed(2);
 
-                let withdrawnPLU = 0;
-                let soldPLU = 0;
-                let redeemedPLU = 0;
-                let totalIncomingPLU = 0;
-                let currentBalance = 0;
-
-                if (data.result.length > 0) {
-                    data.result.forEach(tx => {
-                        const value = parseFloat(tx.value) / 1e18; // Convert from wei to PLU
-                        if (tx.from === '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd') {
-                            withdrawnPLU += value; // Count withdrawn amounts
-                        } else if (excludedWallets.includes(tx.to)) {
-                            redeemedPLU += value; // Count redeemed amounts
-                        } else {
-                            totalIncomingPLU += value; // Count total incoming amounts
-                        }
-
-                        if (tx.from === walletAddress) {
-                            soldPLU += value; // Count outgoing amounts
-                        }
-                        
-                        if (tx.to === walletAddress) {
-                            currentBalance += value; // Calculate current balance
-                        }
-                    });
-                }
-
-                // Calculate percentage sold
-                const percentageSold = (soldPLU / (withdrawnPLU + totalIncomingPLU)) * 100 || 0;
-
-                // Display results
-                resultsDiv.innerHTML = `
-                    <p>Withdrawn PLU: ${withdrawnPLU.toFixed(4)}</p>
-                    <p>Sold PLU: ${soldPLU.toFixed(4)}</p>
-                    <p>Percentage Sold: ${percentageSold.toFixed(2)}%</p>
-                    <p>Redeemed PLU: ${redeemedPLU.toFixed(4)}</p>
-                    <p>Incoming PLU from other wallets: ${totalIncomingPLU.toFixed(4)}</p>
-                `;
-
-                // Display current balance
-                balanceDiv.innerHTML = `<p>Current PLU Balance: ${currentBalance.toFixed(4)}</p>`;
-
+                document.getElementById('withdrawnPLU').innerText = `Withdrawn PLU: ${withdrawnPLU}`;
+                document.getElementById('soldPLU').innerText = `Sold PLU: ${soldPLU}`;
+                document.getElementById('percentageSold').innerText = `Percentage Sold: ${percentageSold}%`;
+                document.getElementById('redeemedPLU').innerText = `Redeemed PLU: ${redeemedPLU}`;
             } catch (error) {
-                console.error('Error fetching transaction data:', error);
-                resultsDiv.innerHTML = `<p>Error fetching data. Please try again.</p>`;
+                console.error('Error analyzing wallet:', error);
             }
-        };
+        }
 
-        // Dark mode toggle
-        document.getElementById('darkModeToggle').onclick = function() {
-            const body = document.body;
-            const container = document.querySelector('.container');
+        async function fetchWithdrawnPLU(walletAddress) {
+            // Replace with actual API call logic
+            const response = await fetch(`https://api.example.com/withdrawnPLU/${walletAddress}`);
+            const data = await response.json();
+            return data.withdrawnPLU; // Adjust according to API response structure
+        }
 
-            body.classList.toggle('dark-mode');
-            container.classList.toggle('dark-mode');
+        async function fetchSoldPLU(walletAddress) {
+            // Replace with actual API call logic
+            const response = await fetch(`https://api.example.com/soldPLU/${walletAddress}`);
+            const data = await response.json();
+            return data.soldPLU; // Adjust according to API response structure
+        }
 
-            // Update icon
-            const darkModeIcon = document.getElementById('darkModeIcon');
-            if (body.classList.contains('dark-mode')) {
-                darkModeIcon.innerHTML = '&#9728;'; // Sun icon
-            } else {
-                darkModeIcon.innerHTML = '&#9790;'; // Moon icon
-            }
-        };
+        async function fetchRedeemedPLU(walletAddress) {
+            // Replace with actual API call logic
+            const response = await fetch(`https://api.example.com/redeemedPLU/${walletAddress}`);
+            const data = await response.json();
+            return data.redeemedPLU; // Adjust according to API response structure
+        }
     </script>
 </body>
 </html>
- 
