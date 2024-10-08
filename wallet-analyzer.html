@@ -37,7 +37,12 @@
         const withdrawalAddress = "0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd";
 
         document.getElementById('checkButton').onclick = async () => {
-            const walletAddress = document.getElementById('walletAddress').value;
+            const walletInput = document.getElementById('walletAddress').value;
+            // Check if input is a valid Etherscan link, and extract the wallet address
+            const walletAddress = walletInput.startsWith('https://etherscan.io/address/')
+                ? walletInput.split('/')[4] // Extract the address from the link
+                : walletInput;
+
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
 
