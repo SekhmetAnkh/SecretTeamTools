@@ -3,64 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perk Optimizer</title>
+    <title>PLU Tools</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
 
-    <div id="app">
-        <h1>{{ title }}</h1>
-        <div>
-            <label for="perkInput">Enter Perk:</label>
-            <input type="text" id="perkInput" v-model="perkInput" @keyup.enter="addPerk">
-            <button @click="addPerk">Add Perk</button>
-        </div>
-        <ul>
-            <li v-for="(perk, index) in perks" :key="index">
-                {{ perk }}
-                <button @click="removePerk(index)">Remove</button>
-            </li>
-        </ul>
-        <div>
-            <label for="searchInput">Search Perks:</label>
-            <input type="text" id="searchInput" v-model="searchQuery">
-        </div>
-        <ul>
-            <li v-for="perk in filteredPerks" :key="perk">{{ perk }}</li>
-        </ul>
+    <div class="content">
+        <h1>Welcome to PLU Tools</h1>
+        <p>This is the home page for our PLU Tools. Use the navigation bar above to access different tools and features.</p>
     </div>
 
     <script src="load-navbar.js"></script>
-    <script>
-        new Vue({
-            el: '#app',
-            data: {
-                title: 'Perk Optimizer',
-                perkInput: '',
-                perks: [],
-                searchQuery: ''
-            },
-            methods: {
-                addPerk() {
-                    if (this.perkInput.trim() !== '') {
-                        this.perks.push(this.perkInput.trim());
-                        this.perkInput = '';
-                    }
-                },
-                removePerk(index) {
-                    this.perks.splice(index, 1);
-                }
-            },
-            computed: {
-                filteredPerks() {
-                    return this.perks.filter(perk =>
-                        perk.toLowerCase().includes(this.searchQuery.toLowerCase())
-                    );
-                }
-            }
-        });
-    </script>
 </body>
 </html>

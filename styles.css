@@ -27,4 +27,10 @@ body {
     color: black;
 }
 
-/* Add any other existing styles here */
+.content {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Add any other common styles here */
