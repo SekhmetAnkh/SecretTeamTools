@@ -7,6 +7,15 @@
     <title>PLU Wallet Analyzer</title>
 </head>
 <body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="wallet-analyzer.html">PLU Wallet Analyzer</a></li>
+            <li><a href="#">Price Checker (Coming Soon)</a></li>
+            <li><a href="#">Perks Checker (Coming Soon)</a></li>
+        </ul>
+    </nav>
+    
     <div class="container">
         <h1>PLU Wallet Analyzer</h1>
         
@@ -14,11 +23,6 @@
         <button id="analyzeButton" class="btn-analyze">Analyze</button>
 
         <div id="results" class="results"></div>
-
-        <div id="exclusions" class="exclusions">
-            <h2>Exclusions</h2>
-            <p>Total Redeemed PLU: <span id="redeemedPLU">0</span></p>
-        </div>
     </div>
 
     <script>
@@ -29,7 +33,6 @@
             const walletAddress = document.getElementById('walletAddress').value;
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
-            const redeemedPLU = document.getElementById('redeemedPLU');
 
             let extractedAddress = walletAddress;
             // If the user enters an Etherscan link, extract the wallet address
@@ -78,9 +81,6 @@
                     <p>Percentage Sold: ${percentageSold.toFixed(2)}%</p>
                     <p>Redeemed PLU: ${redeemedAmount.toFixed(4)}</p>
                 `;
-
-                // Update redeemed PLU display
-                redeemedPLU.innerText = redeemedAmount.toFixed(4);
 
             } catch (error) {
                 console.error('Error fetching transaction data:', error);
