@@ -50,7 +50,7 @@
 
             try {
                 const transaction = parseTransactionData(transactionInput);
-                const pluPrice = await fetchHistoricalPluPrice(transaction.date, transaction.currency);
+                const pluPrice = await getPluPrice(transaction.date, transaction.currency);
                 const reward = calculateReward(transaction.amount, pluPrice);
 
                 resultDiv.innerHTML = `
@@ -81,8 +81,19 @@
             };
         }
 
-        async function fetchHistoricalPluPrice(dateString, currency) {
+        async function getPluPrice(dateString, currency) {
             const date = new Date(dateString);
+            const oneYearAgo = new Date();
+            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+            if (date <= oneYearAgo) {
+                throw new Error('Transaction date is more than one year old. Historical data is not available for dates older than one year.');
+            }
+
+            return await fetchHistoricalPluPrice(date, currency);
+        }
+
+        async function fetchHistoricalPluPrice(date, currency) {
             const formattedDate = formatDate(date);
             const url = `https://api.coingecko.com/api/v3/coins/pluton/history?date=${formattedDate}&localization=false`;
 
