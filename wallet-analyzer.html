@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$PLU Balance Checker</title>
+    <title>PLU Wallet Analyzer</title>
     <style>
         :root {
             --bg-color: #f0f0f0;
@@ -76,7 +76,6 @@
             padding: 15px;
             border-radius: 4px;
             background-color: var(--result-bg);
-            text-align: center;
         }
 
         .theme-switch {
@@ -145,42 +144,67 @@
         </label>
     </div>
 
-    <h1>$PLU Balance Checker</h1>
+    <h1>PLU Wallet Analyzer</h1>
     <div class="input-group">
         <input type="text" id="addressInput" placeholder="Enter Ethereum address or Etherscan link">
-        <button onclick="checkBalance()">Check Balance</button>
+        <button onclick="analyzeWallet()">Analyze</button>
     </div>
     <div id="result"></div>
 
     <script>
         const PLU_CONTRACT_ADDRESS = '0xD8912C10681D8B21Fd3742244f44658dBA12264E';
+        const WITHDRAWAL_WALLET = '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd';
         const ETHERSCAN_API_KEY = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH';
 
-        function checkBalance() {
+        async function analyzeWallet() {
             const input = document.getElementById('addressInput').value;
             const address = extractAddress(input);
             
             if (!address) {
-                document.getElementById('result').innerText = 'Invalid input. Please enter a valid Ethereum address or Etherscan link.';
+                document.getElementById('result').innerHTML = 'Invalid input. Please enter a valid Ethereum address or Etherscan link.';
                 return;
             }
 
-            const apiUrl = `https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${PLU_CONTRACT_ADDRESS}&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`;
+            try {
+                const balance = await getBalance(address);
+                const withdrawals = await getWithdrawals(address);
+                const totalWithdrawn = withdrawals.reduce((sum, event) => sum + parseFloat(event.value), 0);
 
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === '1') {
-                        const balance = parseInt(data.result) / 1e18; // Convert from wei to PLU
-                        document.getElementById('result').innerText = `$PLU Balance: ${balance.toFixed(4)} PLU`;
-                    } else {
-                        document.getElementById('result').innerText = 'Error: Unable to fetch balance.';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('result').innerText = 'Error: Unable to fetch balance.';
-                });
+                let resultHTML = `<p>$PLU Balance: ${balance.toFixed(4)} PLU</p>`;
+                resultHTML += `<p>Total Withdrawn: ${totalWithdrawn.toFixed(4)} PLU</p>`;
+                resultHTML += '<h3>Withdrawal History:</h3>';
+                resultHTML += '<ul>';
+                for (const event of withdrawals) {
+                    const date = new Date(event.timeStamp * 1000).toLocaleString();
+                    resultHTML += `<li>${date}: ${parseFloat(event.value).toFixed(4)} PLU</li>`;
+                }
+                resultHTML += '</ul>';
+
+                document.getElementById('result').innerHTML = resultHTML;
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = 'Error: Unable to fetch data.';
+            }
+        }
+
+        async function getBalance(address) {
+            const apiUrl = `https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${PLU_CONTRACT_ADDRESS}&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`;
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            if (data.status === '1') {
+                return parseInt(data.result) / 1e18; // Convert from wei to PLU
+            }
+            throw new Error('Unable to fetch balance');
+        }
+
+        async function getWithdrawals(address) {
+            const apiUrl = `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${PLU_CONTRACT_ADDRESS}&address=${address}&startblock=0&endblock=999999999&sort=desc&apikey=${ETHERSCAN_API_KEY}`;
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            if (data.status === '1') {
+                return data.result.filter(event => event.from.toLowerCase() === WITHDRAWAL_WALLET.toLowerCase());
+            }
+            throw new Error('Unable to fetch withdrawals');
         }
 
         function extractAddress(input) {
