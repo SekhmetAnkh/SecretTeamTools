@@ -1,9 +1,8 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #e0f7fa; /* Light blue background */
     margin: 0;
     padding: 20px;
-    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
 
 .container {
@@ -13,26 +12,25 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: relative; /* For positioning the toggle */
 }
 
 h1 {
     text-align: center;
-    color: #333;
+    color: #00796b; /* Teal color for headings */
 }
 
 input {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
-    border: 1px solid #ccc;
+    border: 1px solid #00796b; /* Teal border */
     border-radius: 4px;
 }
 
 button {
     width: 100%;
     padding: 10px;
-    background-color: #28a745;
+    background-color: #00796b; /* Teal button */
     color: white;
     border: none;
     border-radius: 4px;
@@ -40,7 +38,7 @@ button {
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #004d40; /* Darker teal on hover */
 }
 
 .results, .exclusions {
@@ -52,57 +50,28 @@ button:hover {
     color: #555;
 }
 
-/* Navigation Bar Styles */
-.navbar {
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    text-align: center;
-    border-radius: 8px 8px 0 0; /* Rounded top corners */
-    margin-bottom: 20px; /* Space below navbar */
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #263238; /* Dark background */
+    color: white; /* White text */
 }
 
-.navbar ul {
-    list-style-type: none;
-    padding: 0;
+.container.dark-mode {
+    background: #37474f; /* Dark container */
 }
 
-.navbar li {
-    display: inline;
-    margin: 0 15px;
+h1.dark-mode {
+    color: #81d4fa; /* Light blue heading in dark mode */
 }
 
-.navbar a {
-    color: white;
-    text-decoration: none;
+input.dark-mode {
+    border: 1px solid #81d4fa; /* Light blue border in dark mode */
 }
 
-.navbar a:hover {
-    text-decoration: underline;
+button.dark-mode {
+    background-color: #4fc3f7; /* Light blue button in dark mode */
 }
 
-/* Dark Mode Styles */
-.dark-mode {
-    background-color: #333; /* Dark background */
-    color: white; /* Light text */
-}
-
-.dark-mode .container {
-    background: #444; /* Darker container background */
-}
-
-.dark-mode input {
-    border: 1px solid #666; /* Darker border for input */
-}
-
-.dark-mode button {
-    background-color: #007bff; /* Button color in dark mode */
-}
-
-.dark-mode button:hover {
-    background-color: #0056b3; /* Darker button color on hover */
-}
-
-.dark-mode .results p, .dark-mode .exclusions p {
-    color: #ddd; /* Light text for results in dark mode */
+button.dark-mode:hover {
+    background-color: #0288d1; /* Darker blue on hover in dark mode */
 }
