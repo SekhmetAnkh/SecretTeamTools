@@ -30,8 +30,8 @@
         <h1>PLU Wallet Analyzer</h1>
 
         <div class="input-group">
-            <label for="wallet-address">Wallet Address:</label>
-            <input type="text" id="wallet-address" placeholder="Enter wallet address">
+            <label for="wallet-input">Wallet Address or Etherscan URL:</label>
+            <input type="text" id="wallet-input" placeholder="Enter wallet address or Etherscan URL">
         </div>
         <div class="input-group">
             <button onclick="analyzeWallet()">Analyze Wallet</button>
@@ -46,18 +46,36 @@
         const WITHDRAWAL_WALLET = '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd';
         const ETHERSCAN_API_KEY = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH';
 
+        function extractWalletAddress(input) {
+            // Check if input is a valid Ethereum address
+            if (/^0x[a-fA-F0-9]{40}$/.test(input)) {
+                return input;
+            }
+
+            // Try to extract address from Etherscan URL
+            const urlPattern = /(?:https?:\/\/)?(?:www\.)?etherscan\.io\/(?:address|token)\/([a-fA-F0-9]{40})/i;
+            const match = input.match(urlPattern);
+            if (match) {
+                return '0x' + match[1];
+            }
+
+            throw new Error('Invalid input. Please enter a valid Ethereum address or Etherscan URL.');
+        }
+
         async function analyzeWallet() {
-            const walletAddress = document.getElementById('wallet-address').value;
+            const walletInput = document.getElementById('wallet-input').value;
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = 'Analyzing wallet...';
 
             try {
+                const walletAddress = extractWalletAddress(walletInput);
                 const balance = await getTokenBalance(walletAddress);
                 const transactions = await getTokenTransactions(walletAddress);
                 const receivedFromWithdrawal = calculateReceivedFromWithdrawal(transactions);
 
                 resultDiv.innerHTML = `
                     <h2>Wallet Analysis Results:</h2>
+                    <p>Wallet Address: ${walletAddress}</p>
                     <p>Current PLU Balance: ${balance.toFixed(2)} PLU</p>
                     <p>Total PLU Received from Withdrawal Wallet: ${receivedFromWithdrawal.toFixed(2)} PLU</p>
                 `;
