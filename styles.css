@@ -12,6 +12,7 @@ body {
 }
 
 .container {
+    position: relative; /* Add relative positioning */
     max-width: 600px;
     margin: auto;
     background: white; /* Light background for container */
@@ -78,16 +79,6 @@ button:hover {
 .dark-mode .results p, .dark-mode .exclusions p {
     color: #ddd; /* Lighter text for results in dark mode */
 }
-.container {
-    position: relative; /* Add relative positioning */
-    max-width: 600px;
-    margin: auto;
-    background: white; /* Light background for container */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s; /* Smooth transition for container */
-}
 
 #themeToggle {
     position: absolute; /* Position button absolutely */
@@ -103,4 +94,3 @@ button:hover {
 .dark-mode #themeToggle {
     color: #f4f4f4; /* Change icon color in dark mode */
 }
-
