@@ -61,6 +61,7 @@
                 let withdrawnPLU = 0;
                 let soldPLU = 0;
                 let redeemedPLU = 0;
+                let incomingPLU = 0;
 
                 // Specify the address for analysis
                 const fromAddress = '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd';
@@ -75,9 +76,14 @@
                             soldPLU += value; // Count outgoing amounts excluding the redemption wallet
                         } else if (excludedWallets.includes(tx.to)) {
                             redeemedPLU += value; // Count redeemed amounts
+                        } else if (tx.to.toLowerCase() === walletAddress.toLowerCase()) {
+                            incomingPLU += value; // Count incoming amounts from other wallets
                         }
                     });
                 }
+
+                // Calculate current balance: Current balance = Withdrawn - Sold + Incoming
+                const currentBalance = withdrawnPLU - soldPLU + incomingPLU;
 
                 // Calculate percentage sold
                 const percentageSold = (soldPLU / (withdrawnPLU || 1)) * 100; // Avoid division by zero
@@ -86,6 +92,8 @@
                 resultsDiv.innerHTML = `
                     <p><strong>Withdrawn PLU:</strong> ${withdrawnPLU.toFixed(4)}</p>
                     <p><strong>Sold PLU:</strong> ${soldPLU.toFixed(4)}</p>
+                    <p><strong>Current PLU Balance:</strong> ${currentBalance.toFixed(4)}</p>
+                    <p><strong>Incoming PLU from other wallets:</strong> ${incomingPLU.toFixed(4)}</p>
                     <p><strong>Percentage Sold:</strong> ${percentageSold.toFixed(2)}%</p>
                     <p><strong>Redeemed PLU:</strong> ${redeemedPLU.toFixed(4)}</p>
                 `;
