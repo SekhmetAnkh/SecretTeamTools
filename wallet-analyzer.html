@@ -7,43 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Existing styles */
-        :root {
-            --bg-color: #f4f7f9;
-            --text-color: #333333;
-            --input-bg: #ffffff;
-            --input-text: #333333;
-            --button-bg: #3498db;
-            --button-text: #ffffff;
-            --accent-color: #2ecc71;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #2c3e50;
-            --text-color: #ecf0f1;
-            --input-bg: #34495e;
-            --input-text: #ecf0f1;
-            --button-bg: #3498db;
-            --button-text: #ffffff;
-            --accent-color: #2ecc71;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            transition: all 0.3s ease;
-            margin: 0;
-            padding: 20px;
-            padding-top: 70px; /* Adjusted to accommodate fixed navbar */
-        }
-
-        /* Rest of the existing styles... */
-
-        /* Add any additional styles here if needed */
-    </style>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -72,39 +35,14 @@
     </div>
 
     <script src="load-navbar.js"></script>
+    <script src="theme-switch.js"></script>
     <script>
-        // Existing JavaScript code
+        // Your existing JavaScript code for wallet analysis
         const PLU_CONTRACT_ADDRESS = '0xD8912C10681D8B21Fd3742244f44658dBA12264E';
         const WITHDRAWAL_WALLET = '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd';
         const ETHERSCAN_API_KEY = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH';
 
-        // Rest of the existing JavaScript functions...
-
-        // Theme switch functionality
-        const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
-
-        function switchTheme(e) {
-            if (e.target.checked) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('theme', 'light');
-            }    
-        }
-
-        toggleSwitch.addEventListener('change', switchTheme, false);
-
-        // Set initial theme based on user preference
-        const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
-
-        if (currentTheme) {
-            document.documentElement.setAttribute('data-theme', currentTheme);
-
-            if (currentTheme === 'dark') {
-                toggleSwitch.checked = true;
-            }
-        }
+        // Rest of your existing JavaScript functions...
     </script>
 </body>
 </html>

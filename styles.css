@@ -1,11 +1,44 @@
+:root {
+    --bg-color: #f4f7f9;
+    --text-color: #333333;
+    --input-bg: #ffffff;
+    --input-text: #333333;
+    --button-bg: #3498db;
+    --button-text: #ffffff;
+    --accent-color: #2ecc71;
+    --navbar-bg: #333;
+    --navbar-text: #f2f2f2;
+    --navbar-hover-bg: #ddd;
+    --navbar-hover-text: #000;
+}
+
+[data-theme="dark"] {
+    --bg-color: #2c3e50;
+    --text-color: #ecf0f1;
+    --input-bg: #34495e;
+    --input-text: #ecf0f1;
+    --button-bg: #3498db;
+    --button-text: #ffffff;
+    --accent-color: #2ecc71;
+    --navbar-bg: #1a242f;
+    --navbar-text: #ecf0f1;
+    --navbar-hover-bg: #34495e;
+    --navbar-hover-text: #ecf0f1;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    transition: all 0.3s ease;
     margin: 0;
-    padding-top: 50px;
+    padding: 20px;
+    padding-top: 70px;
 }
 
 .navbar {
-    background-color: #333;
+    background-color: var(--navbar-bg);
     overflow: hidden;
     position: fixed;
     top: 0;
@@ -16,21 +49,87 @@ body {
 .navbar a {
     float: left;
     display: block;
-    color: #f2f2f2;
+    color: var(--navbar-text);
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
 }
 
 .navbar a:hover {
-    background-color: #ddd;
-    color: black;
+    background-color: var(--navbar-hover-bg);
+    color: var(--navbar-hover-text);
 }
 
 .content {
     padding: 20px;
     max-width: 800px;
     margin: 0 auto;
+}
+
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 34px;
+    position: relative;
+    width: 60px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.icon-container {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.icon-container:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 26px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 26px;
+    border-radius: 50%;
+}
+
+input:checked + .icon-container {
+    background-color: var(--accent-color);
+}
+
+input:checked + .icon-container:before {
+    transform: translateX(26px);
+}
+
+.fa-moon, .fa-sun {
+    color: var(--text-color);
+    font-size: 18px;
+    position: absolute;
+    top: 8px;
+}
+
+.fa-moon {
+    left: 8px;
+}
+
+.fa-sun {
+    right: 8px;
 }
 
 /* Add any other common styles here */
