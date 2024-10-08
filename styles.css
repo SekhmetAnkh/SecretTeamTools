@@ -31,6 +31,22 @@ body {
     background: #444; /* Dark background for container */
 }
 
+.navbar {
+    display: flex;
+    justify-content: space-around; /* Space out navigation links */
+    margin-bottom: 20px; /* Space below the navbar */
+}
+
+.navbar a {
+    color: #333; /* Link color */
+    text-decoration: none; /* Remove underline */
+    font-weight: bold; /* Bold links */
+}
+
+.dark-mode .navbar a {
+    color: #f4f4f4; /* Light link color in dark mode */
+}
+
 h1 {
     text-align: center;
     color: #333;
