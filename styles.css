@@ -31,7 +31,7 @@ input {
 button {
     width: 100%;
     padding: 10px;
-    background-color: #007bff; /* Primary blue color */
+    background-color: #0056b3; /* Primary blue color */
     color: white;
     border: none;
     border-radius: 4px;
@@ -40,7 +40,7 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+    background-color: #004494; /* Darker blue on hover */
 }
 
 .results {
@@ -54,7 +54,7 @@ button:hover {
 
 /* Navbar styles */
 .navbar {
-    background-color: #007bff; /* Primary blue color */
+    background-color: #0056b3; /* Primary blue color */
     padding: 10px;
     border-radius: 8px;
     margin-bottom: 20px;
@@ -91,4 +91,13 @@ body.dark-mode {
 
 .results p.dark-mode {
     color: #ddd;
+}
+
+/* Dark mode button styles */
+#darkModeToggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
 }
