@@ -3,101 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wallet Analyzer</title>
+    <title>$PLU Balance Checker</title>
+    <style>
+        :root {
+            --bg-color: #f0f0f0;
+            --text-color: #333;
+            --input-bg: #fff;
+            --input-border: #ccc;
+            --button-bg: #4CAF50;
+            --button-text: #fff;
+            --result-bg: #e0e0e0;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #222;
+            --text-color: #f0f0f0;
+            --input-bg: #333;
+            --input-border: #555;
+            --button-bg: #4CAF50;
+            --button-text: #fff;
+            --result-bg: #444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        input {
+            flex-grow: 1;
+            font-size: 16px;
+            padding: 10px;
+            border: 1px solid var(--input-border);
+            border-radius: 4px 0 0 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: var(--result-bg);
+            text-align: center;
+        }
+
+        .theme-switch {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .theme-switch label {
+            margin-right: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+    </style>
 </head>
 <body>
-    <h1>Wallet Analyzer</h1>
-    <form id="walletForm">
-        <label for="walletAddress">Enter Wallet Address:</label>
-        <input type="text" id="walletAddress" required>
-        <button type="submit">Analyze</button>
-    </form>
-    <div id="results">
-        <p id="withdrawnPLU"></p>
-        <p id="soldPLU"></p>
-        <p id="redeemedPLU"></p>
-        <p id="currentBalance"></p>
-        <p id="percentageSold"></p>
-        <p id="incomingPLU"></p> <!-- Field for incoming PLU -->
-        <p id="percentageWithdrawnSold"></p> <!-- Field for percentage of withdrawn PLU sold -->
+    <div class="theme-switch">
+        <label for="theme-toggle">Dark Mode</label>
+        <label class="switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
     </div>
 
+    <h1>$PLU Balance Checker</h1>
+    <div class="input-group">
+        <input type="text" id="addressInput" placeholder="Enter Ethereum address or Etherscan link">
+        <button onclick="checkBalance()">Check Balance</button>
+    </div>
+    <div id="result"></div>
+
     <script>
-        document.getElementById('walletForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
-            const walletAddress = document.getElementById('walletAddress').value;
-            await analyzeWallet(walletAddress);
-        });
+        const PLU_CONTRACT_ADDRESS = '0xD8912C10681D8B21Fd3742244f44658dBA12264E';
+        const ETHERSCAN_API_KEY = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH';
 
-        async function analyzeWallet(walletAddress) {
-            try {
-                const apiKey = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH'; // Your Etherscan API key
-                const withdrawalWalletAddress = '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd';
-                const transactionsResponse = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`);
-                const transactionsData = await transactionsResponse.json();
-                const transactions = transactionsData.result;
-
-                // Initialize values
-                let withdrawnPLU = 0;
-                let redeemedPLU = await fetchRedeemedPLU(walletAddress); // Fetch redeemed PLU
-                let incomingPLU = 0;
-                let soldPLU = 0;
-
-                // Process user transactions
-                transactions.forEach(tx => {
-                    // Check for incoming PLU from the withdrawal wallet
-                    if (tx.from.toLowerCase() === withdrawalWalletAddress.toLowerCase() && tx.to.toLowerCase() === walletAddress.toLowerCase()) {
-                        withdrawnPLU += parseFloat(tx.value) / Math.pow(10, 18); // Adjust based on token decimals
-                    }
-
-                    // Calculate incoming PLU from other addresses
-                    if (tx.to.toLowerCase() === walletAddress.toLowerCase()) {
-                        incomingPLU += parseFloat(tx.value) / Math.pow(10, 18); // Adjust based on token decimals
-                    } 
-                    // Calculate sold PLU
-                    else if (tx.from.toLowerCase() === walletAddress.toLowerCase()) {
-                        soldPLU += parseFloat(tx.value) / Math.pow(10, 18); // Adjust based on token decimals
-                    }
-                });
-
-                // Calculate the current balance
-                const currentBalance = withdrawnPLU - soldPLU - redeemedPLU;
-
-                // Calculate percentage sold
-                const percentageSold = ((soldPLU / withdrawnPLU) * 100).toFixed(2);
-                const percentageWithdrawnSold = ((soldPLU / (withdrawnPLU - redeemedPLU)) * 100).toFixed(2); // Percentage of withdrawn PLU sold
-
-                // Display results
-                document.getElementById('withdrawnPLU').innerText = `Withdrawn PLU: ${withdrawnPLU}`;
-                document.getElementById('soldPLU').innerText = `Sold PLU: ${soldPLU}`;
-                document.getElementById('redeemedPLU').innerText = `Redeemed PLU: ${redeemedPLU}`;
-                document.getElementById('currentBalance').innerText = `Current Balance: ${currentBalance} PLU`;
-                document.getElementById('percentageSold').innerText = `Percentage Sold: ${percentageSold}%`;
-                document.getElementById('incomingPLU').innerText = `Incoming PLU from Other Addresses: ${incomingPLU}`;
-                document.getElementById('percentageWithdrawnSold').innerText = `Percentage of Withdrawn PLU Sold: ${percentageWithdrawnSold}%`;
-            } catch (error) {
-                console.error('Error analyzing wallet:', error);
+        function checkBalance() {
+            const input = document.getElementById('addressInput').value;
+            const address = extractAddress(input);
+            
+            if (!address) {
+                document.getElementById('result').innerText = 'Invalid input. Please enter a valid Ethereum address or Etherscan link.';
+                return;
             }
+
+            const apiUrl = `https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${PLU_CONTRACT_ADDRESS}&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === '1') {
+                        const balance = parseInt(data.result) / 1e18; // Convert from wei to PLU
+                        document.getElementById('result').innerText = `$PLU Balance: ${balance.toFixed(4)} PLU`;
+                    } else {
+                        document.getElementById('result').innerText = 'Error: Unable to fetch balance.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('result').innerText = 'Error: Unable to fetch balance.';
+                });
         }
 
-        async function fetchRedeemedPLU(walletAddress) {
-            const redeemWalletAddress = '0xE18F094DDd37f0eB2b651b65C4Aad080aFe90e51';
-            const apiKey = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH'; // Your Etherscan API key
-            const transactionsResponse = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${redeemWalletAddress}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`);
-            const transactionsData = await transactionsResponse.json();
-            const transactions = transactionsData.result;
-
-            let redeemedPLU = 0;
-
-            // Calculate total PLU sent to the redeem wallet
-            transactions.forEach(tx => {
-                if (tx.from.toLowerCase() === walletAddress.toLowerCase()) {
-                    redeemedPLU += parseFloat(tx.value) / Math.pow(10, 18); // Adjust based on token decimals
-                }
-            });
-
-            return redeemedPLU;
+        function extractAddress(input) {
+            if (/^0x[a-fA-F0-9]{40}$/.test(input)) {
+                return input;
+            }
+            
+            const match = input.match(/(?:0x[a-fA-F0-9]{40})/);
+            if (match) {
+                return match[0];
+            }
+            
+            return null;
         }
+
+        // Theme switcher
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('change', () => {
+            document.body.setAttribute('data-theme', themeToggle.checked ? 'dark' : 'light');
+        });
     </script>
 </body>
 </html>
