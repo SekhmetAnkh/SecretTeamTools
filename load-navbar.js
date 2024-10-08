@@ -1,5 +1,11 @@
-fetch('navbar.html')
-    .then(response => response.text())
-    .then(data => {
-        document.getElementById('navbar-placeholder').innerHTML = data;
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    const navbarPlaceholder = document.getElementById('navbar-placeholder');
+    navbarPlaceholder.innerHTML = `
+        <div class="navbar">
+            <a href="index.html">Home</a>
+            <a href="wallet-analyzer.html">Wallet Analyzer</a>
+            <a href="perk-checker.html">Perk Checker</a>
+            <a href="reward-checker.html">Reward Checker</a>
+        </div>
+    `;
+});

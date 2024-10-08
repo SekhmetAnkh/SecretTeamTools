@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLU Reward Checker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        let theme = localStorage.getItem('theme');
+        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="icon-container">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-moon"></i>
+            </div>
+        </label>
+    </div>
+
+    <div class="container fade-in">
+        <h1>PLU Reward Checker</h1>
+
+        <div class="input-group">
+            <label for="transaction-input">Transaction Data:</label>
+            <textarea id="transaction-input" rows="4" placeholder="Paste transaction data here..."></textarea>
+        </div>
+        <div class="input-group">
+            <button onclick="checkReward()">Calculate Reward</button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script src="load-navbar.js"></script>
+    <script src="theme-switch.js"></script>
+    <script>
+        const CASHBACK_RATE = 0.03; // 3% cashback
+
+        async function checkReward() {
+            const transactionInput = document.getElementById('transaction-input').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Calculating reward...';
+
+            try {
+                const transaction = parseTransactionData(transactionInput);
+                const pluPrice = await fetchPluPrice(transaction.currency);
+                const reward = calculateReward(transaction.amount, pluPrice);
+
+                resultDiv.innerHTML = `
+                    <h2>Reward Calculation Results:</h2>
+                    <p>Transaction Amount: ${transaction.amount} ${transaction.currency}</p>
+                    <p>Description: ${transaction.description}</p>
+                    <p>Date: ${transaction.date}</p>
+                    <p>PLU Price: ${pluPrice.toFixed(2)} ${transaction.currency}</p>
+                    <p>Cashback: ${reward.cashback.toFixed(2)} ${transaction.currency}</p>
+                    <p>PLU Reward: ${reward.pluReward.toFixed(4)} PLU</p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+
+        function parseTransactionData(input) {
+            const fields = input.split('\t');
+            return {
+                amount: parseFloat(fields[5]),
+                currency: fields[6],
+                description: fields[9],
+                date: fields[11]
+            };
+        }
+
+        async function fetchPluPrice(currency) {
+            const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=pluton&vs_currencies=${currency.toLowerCase()}`);
+            const data = await response.json();
+            return data.pluton[currency.toLowerCase()];
+        }
+
+        function calculateReward(amount, pluPrice) {
+            const cashback = amount * CASHBACK_RATE;
+            const pluReward = cashback / pluPrice;
+            return { cashback, pluReward };
+        }
+    </script>
+</body>
+</html>
