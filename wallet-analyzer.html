@@ -13,44 +13,30 @@
             <li><a href="wallet-analyzer.html">PLU Wallet Analyzer</a></li>
             <li><a href="#">Price Checker (Coming Soon)</a></li>
             <li><a href="#">Perks Checker (Coming Soon)</a></li>
-            <li style="float: right;">
-                <button id="darkModeToggle" title="Toggle Dark Mode">🌙</button>
+            <li>
+                <button id="darkModeToggle" aria-label="Toggle dark mode">
+                    🌙
+                </button>
             </li>
         </ul>
     </nav>
     <div class="container">
         <h1>PLU Wallet Analyzer</h1>
         <input type="text" id="walletAddress" placeholder="Enter Wallet Address or Etherscan Link">
-        <button id="checkButton">Analyze Wallet</button>
+        <button id="checkButton">Analyze</button>
         
         <div id="results" class="results"></div>
     </div>
 
     <script>
-        // Dark mode toggle functionality
-        const body = document.body;
-        const container = document.querySelector('.container');
-        const darkModeToggle = document.getElementById('darkModeToggle');
+        document.getElementById('darkModeToggle').onclick = function() {
+            const body = document.body;
+            const container = document.querySelector('.container');
 
-        darkModeToggle.onclick = function() {
             body.classList.toggle('dark-mode');
             container.classList.toggle('dark-mode');
-
-            // Save user preference in localStorage
-            if (body.classList.contains('dark-mode')) {
-                localStorage.setItem('darkMode', 'enabled');
-            } else {
-                localStorage.setItem('darkMode', 'disabled');
-            }
         };
 
-        // Check user preference on load
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            body.classList.add('dark-mode');
-            container.classList.add('dark-mode');
-        }
-
-        // Fetch PLU transaction data from Etherscan
         document.getElementById('checkButton').onclick = async () => {
             const walletAddress = document.getElementById('walletAddress').value;
             const resultsDiv = document.getElementById('results');
@@ -65,29 +51,33 @@
                 let soldPLU = 0;
                 let redeemedPLU = 0;
 
+                // Specify the address for analysis
+                const fromAddress = '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd';
+                const excludedWallets = ["0xE18F094DDd37f0eB2b651b65C4Aad080aFe90e51"];
+
                 if (data.result.length > 0) {
                     data.result.forEach(tx => {
                         const value = parseFloat(tx.value) / 1e18; // Convert from wei to PLU
-                        if (tx.from === "0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd") {
-                            withdrawnPLU += value; // Count withdrawn amounts
-                        } else if (tx.from !== "0xE18F094DDd37f0eB2b651b65C4Aad080aFe90e51" && tx.to === walletAddress) {
-                            soldPLU += value; // Count sold amounts
-                        } else if (tx.to === "0xE18F094DDd37f0eB2b651b65C4Aad080aFe90e51") {
+                        if (tx.from.toLowerCase() === fromAddress.toLowerCase()) {
+                            withdrawnPLU += value; // Count received amounts
+                        } else if (tx.from.toLowerCase() === walletAddress.toLowerCase() && !excludedWallets.includes(tx.to)) {
+                            soldPLU += value; // Count outgoing amounts excluding the redemption wallet
+                        } else if (excludedWallets.includes(tx.to)) {
                             redeemedPLU += value; // Count redeemed amounts
                         }
                     });
                 }
 
-                const percentageSold = (soldPLU / withdrawnPLU * 100).toFixed(2);
+                // Calculate percentage sold
+                const percentageSold = (soldPLU / (withdrawnPLU || 1)) * 100; // Avoid division by zero
 
                 // Display results
                 resultsDiv.innerHTML = `
                     <p>Withdrawn PLU: ${withdrawnPLU.toFixed(4)}</p>
                     <p>Sold PLU: ${soldPLU.toFixed(4)}</p>
-                    <p>Percentage Sold: ${percentageSold}%</p>
+                    <p>Percentage Sold: ${percentageSold.toFixed(2)}%</p>
                     <p>Redeemed PLU: ${redeemedPLU.toFixed(4)}</p>
                 `;
-
             } catch (error) {
                 console.error('Error fetching transaction data:', error);
                 resultsDiv.innerHTML = `<p>Error fetching data. Please try again.</p>`;
