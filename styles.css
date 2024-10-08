@@ -48,7 +48,6 @@ body {
     top: 0;
     width: 100%;
     z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar a {
@@ -64,30 +63,67 @@ body {
 .navbar a:hover {
     background-color: var(--navbar-hover-bg);
     color: var(--navbar-hover-text);
-    transform: translateY(-2px);
 }
 
-.content {
-    padding: 20px;
+.container {
     max-width: 800px;
     margin: 0 auto;
+    padding: 20px;
     background-color: var(--card-bg);
     border-radius: 10px;
     box-shadow: var(--card-shadow);
+}
+
+h1, h2, h3 {
+    color: var(--accent-color);
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+input[type="text"], input[type="date"], textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--input-text);
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    color: var(--input-text);
     transition: all 0.3s ease;
 }
 
-.content:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
+button:hover {
+    opacity: 0.8;
+}
+
+#result {
+    margin-top: 20px;
+}
+
+/* Theme switch styles */
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
-    position: absolute;
+    position: fixed;
     top: 10px;
     right: 10px;
+    z-index: 1001; /* Ensure it's above the navbar */
 }
 
 .theme-switch {
@@ -126,136 +162,26 @@ body {
 }
 
 input:checked + .icon-container {
-    background-color: var(--accent-color);
+    background-color: #66bb6a;
 }
 
 input:checked + .icon-container:before {
     transform: translateX(26px);
 }
 
-.fa-moon, .fa-sun {
-    color: var(--text-color);
+.fa-sun, .fa-moon {
+    color: #f39c12;
     font-size: 18px;
     position: absolute;
     top: 8px;
-    transition: all 0.3s ease;
-}
-
-.fa-moon {
-    left: 8px;
 }
 
 .fa-sun {
+    left: 8px;
+}
+
+.fa-moon {
     right: 8px;
-}
-
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    box-shadow: var(--card-shadow);
-    transition: all 0.3s ease;
-    box-sizing: border-box; /* Add this line */
-}
-
-.container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.input-group {
-    margin-bottom: 20px;
-    width: 100%; /* Add this line */
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    border: 2px solid var(--input-text);
-    border-radius: 8px;
-    background-color: var(--input-bg);
-    color: var(--input-text);
-    transition: all 0.3s ease;
-    box-sizing: border-box; /* Add this line */
-}
-
-input[type="text"]:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
-}
-
-button {
-    background-color: var(--button-bg);
-    color: var(--button-text);
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-button:hover {
-    opacity: 0.9;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-#result {
-    margin-top: 20px;
-    padding: 20px;
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    box-shadow: var(--card-shadow);
-    transition: all 0.3s ease;
-}
-
-#result:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-h1, h2, h3 {
-    color: var(--accent-color);
-    margin-bottom: 20px;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: var(--input-bg);
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-li:hover {
-    transform: translateX(5px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
 }
 
 /* Perk Checker specific styles */
