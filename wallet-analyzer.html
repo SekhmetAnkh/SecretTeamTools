@@ -38,11 +38,7 @@
             container.classList.toggle('dark-mode');
 
             // Switch icon based on dark mode state
-            if (body.classList.contains('dark-mode')) {
-                darkModeToggle.innerHTML = '☀️'; // Sun icon for light mode
-            } else {
-                darkModeToggle.innerHTML = '🌙'; // Moon icon for dark mode
-            }
+            darkModeToggle.innerHTML = body.classList.contains('dark-mode') ? '☀️' : '🌙';
         };
 
         document.getElementById('checkButton').onclick = async () => {
@@ -81,14 +77,14 @@
 
                 // Display results
                 resultsDiv.innerHTML = `
-                    <p>Withdrawn PLU: ${withdrawnPLU.toFixed(4)}</p>
-                    <p>Sold PLU: ${soldPLU.toFixed(4)}</p>
-                    <p>Percentage Sold: ${percentageSold.toFixed(2)}%</p>
-                    <p>Redeemed PLU: ${redeemedPLU.toFixed(4)}</p>
+                    <p><strong>Withdrawn PLU:</strong> ${withdrawnPLU.toFixed(4)}</p>
+                    <p><strong>Sold PLU:</strong> ${soldPLU.toFixed(4)}</p>
+                    <p><strong>Percentage Sold:</strong> ${percentageSold.toFixed(2)}%</p>
+                    <p><strong>Redeemed PLU:</strong> ${redeemedPLU.toFixed(4)}</p>
                 `;
             } catch (error) {
                 console.error('Error fetching transaction data:', error);
-                resultsDiv.innerHTML = `<p>Error fetching data. Please try again.</p>`;
+                resultsDiv.innerHTML = `<p style="color: red;">Error fetching data. Please check the wallet address and try again.</p>`;
             }
         };
     </script>
