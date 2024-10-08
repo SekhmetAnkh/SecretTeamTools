@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLU Perk Checker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        // Immediately set the theme to prevent flash
+        let theme = localStorage.getItem('theme');
+        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="icon-container">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-moon"></i>
+            </div>
+        </label>
+    </div>
+
+    <div class="container fade-in">
+        <h1>PLU Perk Checker</h1>
+
+        <div class="input-group">
+            <label for="perk-list">Perk List (paste the entire list including headers):</label>
+            <textarea id="perk-list" rows="10" placeholder="Status&#9;Perks&#9;Created at&#9;Updated at&#10;expired&#9;eBay&#9;03/04/2022 19:28&#9;03/04/2022 19:28"></textarea>
+        </div>
+        <div class="input-group">
+            <label for="check-date">Check Date:</label>
+            <input type="date" id="check-date">
+        </div>
+        <div class="input-group">
+            <button onclick="checkPerks()">Check Perks</button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script src="load-navbar.js"></script>
+    <script src="theme-switch.js"></script>
+    <script>
+        function checkPerks() {
+            const perkListInput = document.getElementById('perk-list').value;
+            const checkDate = new Date(document.getElementById('check-date').value);
+            const resultDiv = document.getElementById('result');
+
+            if (isNaN(checkDate.getTime())) {
+                resultDiv.innerHTML = 'Please enter a valid date.';
+                return;
+            }
+
+            const perks = parsePerkList(perkListInput);
+            const activePerksOnDate = getActivePerks(perks, checkDate);
+            const activePerksToday = getActivePerks(perks, new Date());
+
+            displayResults(activePerksOnDate, activePerksToday, checkDate);
+        }
+
+        function parsePerkList(input) {
+            const lines = input.trim().split('\n');
+            // Remove the header line
+            lines.shift();
+
+            return lines.map(line => {
+                const [status, perks, createdAt, updatedAt] = line.split('\t');
+                return {
+                    status,
+                    perks: perks.split(', ').filter(perk => perk.trim() !== ''),
+                    createdAt: parseDate(createdAt),
+                    updatedAt: parseDate(updatedAt)
+                };
+            });
+        }
+
+        function parseDate(dateString) {
+            const [day, month, year, time] = dateString.split(/[/ :]/);
+            return new Date(`${year}-${month}-${day}T${time}`);
+        }
+
+        function getActivePerks(perks, date) {
+            // Sort perks by updatedAt date in descending order
+            perks.sort((a, b) => b.updatedAt - a.updatedAt);
+
+            // Find the first perk entry that is not after the check date
+            const activePerkEntry = perks.find(perk => perk.updatedAt <= date);
+
+            return activePerkEntry ? activePerkEntry.perks : [];
+        }
+
+        function displayResults(activePerksOnDate, activePerksToday, checkDate) {
+            const resultDiv = document.getElementById('result');
+            const checkDateString = checkDate.toLocaleDateString('en-GB');
+            const todayString = new Date().toLocaleDateString('en-GB');
+
+            let resultHTML = `<h2>Active Perks on ${checkDateString}:</h2>`;
+            resultHTML += generatePerkList(activePerksOnDate);
+
+            resultHTML += `<h2>Active Perks Today (${todayString}):</h2>`;
+            resultHTML += generatePerkList(activePerksToday);
+
+            resultDiv.innerHTML = resultHTML;
+        }
+
+        function generatePerkList(perks) {
+            if (perks.length === 0) {
+                return '<p>No active perks found.</p>';
+            } else {
+                return `
+                    <ul>
+                        ${perks.map(perk => `<li>${perk}</li>`).join('')}
+                    </ul>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
