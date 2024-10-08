@@ -257,3 +257,38 @@ li:hover {
 .fade-in {
     animation: fadeIn 0.5s ease-in;
 }
+
+/* Perk Checker specific styles */
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--input-text);
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    font-family: 'Roboto', sans-serif;
+    resize: vertical;
+}
+
+#result h2 {
+    margin-top: 20px;
+    color: var(--accent-color);
+}
+
+#result ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#result li {
+    margin-bottom: 5px;
+    padding: 5px 10px;
+    background-color: var(--card-bg);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+#result li:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
