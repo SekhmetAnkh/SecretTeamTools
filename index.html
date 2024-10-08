@@ -3,208 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLU Tools</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: #f4f7f9;
-            --text-color: #333333;
-            --card-bg: #ffffff;
-            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --button-bg: #3498db;
-            --button-text: #ffffff;
-            --accent-color: #2ecc71;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #2c3e50;
-            --text-color: #ecf0f1;
-            --card-bg: #34495e;
-            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            --button-bg: #3498db;
-            --button-text: #ffffff;
-            --accent-color: #2ecc71;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            padding: 20px;
-            transition: all 0.3s ease;
-            margin: 0;
-        }
-
-        h1 {
-            text-align: center;
-            color: var(--text-color);
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 30px;
-            width: 300px;
-            text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: var(--card-shadow);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .card h2 {
-            color: var(--text-color);
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .card p {
-            color: var(--text-color);
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .card a {
-            display: inline-block;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 25px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .card a:hover {
-            background-color: var(--accent-color);
-            transform: scale(1.05);
-        }
-
-        .theme-switch-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .theme-switch {
-            display: inline-block;
-            position: relative;
-            width: 60px;
-            height: 34px;
-        }
-
-        .theme-switch input {
-            display: none;
-        }
-
-        .icon-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 5px;
-            cursor: pointer;
-            background-color: #ccc;
-            border-radius: 34px;
-            transition: background-color 0.4s;
-        }
-
-        .icon-container i {
-            font-size: 18px;
-            color: #fff;
-            transition: opacity 0.3s;
-        }
-
-        .icon-container .fa-sun {
-            opacity: 1;
-        }
-
-        .icon-container .fa-moon {
-            opacity: 0;
-        }
-
-        input:checked + .icon-container {
-            background-color: var(--accent-color);
-        }
-
-        input:checked + .icon-container .fa-sun {
-            opacity: 0;
-        }
-
-        input:checked + .icon-container .fa-moon {
-            opacity: 1;
-        }
-
-        .theme-switch-wrapper em {
-            margin-left: 10px;
-            font-size: 1rem;
-        }
-    </style>
+    <title>Perk Optimizer</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 </head>
 <body>
-    <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="checkbox">
-            <input type="checkbox" id="checkbox" />
-            <div class="icon-container">
-                <i class="fas fa-sun"></i>
-                <i class="fas fa-moon"></i>
-            </div>
-        </label>
-        <em>Dark Mode</em>
+    <div id="navbar-placeholder"></div>
+
+    <div id="app">
+        <h1>{{ title }}</h1>
+        <div>
+            <label for="perkInput">Enter Perk:</label>
+            <input type="text" id="perkInput" v-model="perkInput" @keyup.enter="addPerk">
+            <button @click="addPerk">Add Perk</button>
+        </div>
+        <ul>
+            <li v-for="(perk, index) in perks" :key="index">
+                {{ perk }}
+                <button @click="removePerk(index)">Remove</button>
+            </li>
+        </ul>
+        <div>
+            <label for="searchInput">Search Perks:</label>
+            <input type="text" id="searchInput" v-model="searchQuery">
+        </div>
+        <ul>
+            <li v-for="perk in filteredPerks" :key="perk">{{ perk }}</li>
+        </ul>
     </div>
 
-    <h1>PLU Tools</h1>
-
-    <div class="container">
-        <!-- ... (existing card content) ... -->
-    </div>
-
+    <script src="load-navbar.js"></script>
     <script>
-        const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
-
-        function switchTheme(e) {
-            if (e.target.checked) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-                localStorage.setItem('theme', 'light');
-            }    
-        }
-
-        toggleSwitch.addEventListener('change', switchTheme, false);
-
-        // Set initial theme based on user preference
-        const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
-
-        if (currentTheme) {
-            document.documentElement.setAttribute('data-theme', currentTheme);
-
-            if (currentTheme === 'dark') {
-                toggleSwitch.checked = true;
+        new Vue({
+            el: '#app',
+            data: {
+                title: 'Perk Optimizer',
+                perkInput: '',
+                perks: [],
+                searchQuery: ''
+            },
+            methods: {
+                addPerk() {
+                    if (this.perkInput.trim() !== '') {
+                        this.perks.push(this.perkInput.trim());
+                        this.perkInput = '';
+                    }
+                },
+                removePerk(index) {
+                    this.perks.splice(index, 1);
+                }
+            },
+            computed: {
+                filteredPerks() {
+                    return this.perks.filter(perk =>
+                        perk.toLowerCase().includes(this.searchQuery.toLowerCase())
+                    );
+                }
             }
-        }
+        });
     </script>
 </body>
 </html>

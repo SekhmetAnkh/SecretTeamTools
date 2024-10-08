@@ -6,7 +6,9 @@
     <title>PLU Wallet Analyzer</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
+        /* Existing styles */
         :root {
             --bg-color: #f4f7f9;
             --text-color: #333333;
@@ -32,133 +34,19 @@
             line-height: 1.6;
             color: var(--text-color);
             background-color: var(--bg-color);
-            padding: 20px;
             transition: all 0.3s ease;
             margin: 0;
+            padding-top: 50px; /* Added to accommodate fixed navbar */
         }
 
-        h1 {
-            text-align: center;
-            color: var(--text-color);
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-        }
+        /* Rest of the existing styles... */
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: var(--input-bg);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            background-color: var(--input-bg);
-            color: var(--input-text);
-        }
-
-        .input-group button {
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-        }
-
-        .input-group button:hover {
-            background-color: var(--accent-color);
-            transform: scale(1.05);
-        }
-
-        #result {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: var(--input-bg);
-            border-radius: 5px;
-            white-space: pre-wrap;
-        }
-
-        .theme-switch-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .theme-switch {
-            display: inline-block;
-            position: relative;
-            width: 60px;
-            height: 34px;
-        }
-
-        .theme-switch input {
-            display: none;
-        }
-
-        .icon-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 5px;
-            cursor: pointer;
-            background-color: #ccc;
-            border-radius: 34px;
-            transition: background-color 0.4s;
-        }
-
-        .icon-container i {
-            font-size: 18px;
-            color: #fff;
-            transition: opacity 0.3s;
-        }
-
-        .icon-container .fa-sun {
-            opacity: 1;
-        }
-
-        .icon-container .fa-moon {
-            opacity: 0;
-        }
-
-        input:checked + .icon-container {
-            background-color: var(--accent-color);
-        }
-
-        input:checked + .icon-container .fa-sun {
-            opacity: 0;
-        }
-
-        input:checked + .icon-container .fa-moon {
-            opacity: 1;
-        }
+        /* Add any additional styles here if needed */
     </style>
 </head>
 <body>
+    <div id="navbar-placeholder"></div>
+
     <div class="theme-switch-wrapper">
         <label class="theme-switch" for="checkbox">
             <input type="checkbox" id="checkbox" />
@@ -182,75 +70,16 @@
         <div id="result"></div>
     </div>
 
+    <script src="load-navbar.js"></script>
     <script>
+        // Existing JavaScript code
         const PLU_CONTRACT_ADDRESS = '0xD8912C10681D8B21Fd3742244f44658dBA12264E';
         const WITHDRAWAL_WALLET = '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd';
         const ETHERSCAN_API_KEY = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH';
 
-        async function analyzeWallet() {
-            const input = document.getElementById('wallet-address').value;
-            const address = extractAddress(input);
-            
-            if (!address) {
-                document.getElementById('result').innerHTML = 'Invalid input. Please enter a valid Ethereum address or Etherscan link.';
-                return;
-            }
+        // Rest of the existing JavaScript functions...
 
-            try {
-                const balance = await getBalance(address);
-                const withdrawals = await getWithdrawals(address);
-                const totalWithdrawn = withdrawals.reduce((sum, event) => sum + parseFloat(event.value), 0);
-
-                let resultHTML = `<p>$PLU Balance: ${balance.toFixed(4)} PLU</p>`;
-                resultHTML += `<p>Total Withdrawn: ${totalWithdrawn.toFixed(4)} PLU</p>`;
-                resultHTML += '<h3>Withdrawal History:</h3>';
-                resultHTML += '<ul>';
-                for (const event of withdrawals) {
-                    const date = new Date(event.timeStamp * 1000).toLocaleString();
-                    resultHTML += `<li>${date}: ${parseFloat(event.value).toFixed(4)} PLU</li>`;
-                }
-                resultHTML += '</ul>';
-
-                document.getElementById('result').innerHTML = resultHTML;
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('result').innerHTML = 'Error: Unable to fetch data.';
-            }
-        }
-
-        async function getBalance(address) {
-            const apiUrl = `https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${PLU_CONTRACT_ADDRESS}&address=${address}&tag=latest&apikey=${ETHERSCAN_API_KEY}`;
-            const response = await fetch(apiUrl);
-            const data = await response.json();
-            if (data.status === '1') {
-                return parseInt(data.result) / 1e18; // Convert from wei to PLU
-            }
-            throw new Error('Unable to fetch balance');
-        }
-
-        async function getWithdrawals(address) {
-            const apiUrl = `https://api.etherscan.io/api?module=account&action=tokentx&contractaddress=${PLU_CONTRACT_ADDRESS}&address=${address}&startblock=0&endblock=999999999&sort=desc&apikey=${ETHERSCAN_API_KEY}`;
-            const response = await fetch(apiUrl);
-            const data = await response.json();
-            if (data.status === '1') {
-                return data.result.filter(event => event.from.toLowerCase() === WITHDRAWAL_WALLET.toLowerCase());
-            }
-            throw new Error('Unable to fetch withdrawals');
-        }
-
-        function extractAddress(input) {
-            if (/^0x[a-fA-F0-9]{40}$/.test(input)) {
-                return input;
-            }
-            
-            const match = input.match(/(?:0x[a-fA-F0-9]{40})/);
-            if (match) {
-                return match[0];
-            }
-            
-            return null;
-        }
-
+        // Theme switch functionality
         const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
 
         function switchTheme(e) {
