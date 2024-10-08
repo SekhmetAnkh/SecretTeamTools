@@ -40,7 +40,6 @@
             <button onclick="checkPerks()">Check Perks</button>
         </div>
         <div id="result"></div>
-        <div id="debug"></div>
     </div>
 
     <script src="load-navbar.js"></script>
@@ -50,7 +49,6 @@
             const perkListInput = document.getElementById('perk-list').value;
             const checkDateInput = document.getElementById('check-date').value;
             const resultDiv = document.getElementById('result');
-            const debugDiv = document.getElementById('debug');
 
             if (!checkDateInput) {
                 resultDiv.innerHTML = 'Please enter a valid date.';
@@ -61,12 +59,6 @@
             const checkDate = new Date(Date.UTC(year, month - 1, day));
 
             const perks = parsePerkList(perkListInput);
-
-            debugDiv.innerHTML = `<h3>Debug Information:</h3>
-                <p>Check Date: ${checkDate.toUTCString()}</p>
-                <p>Number of parsed perk entries: ${perks.length}</p>
-                <p>First perk entry: ${JSON.stringify(perks[0], null, 2)}</p>
-                <p>Last perk entry: ${JSON.stringify(perks[perks.length - 1], null, 2)}</p>`;
 
             try {
                 const activePerksOnDate = getActivePerks(perks, checkDate);
@@ -96,11 +88,22 @@
 
         function parseDate(dateString) {
             if (!dateString) return null;
-            const [datePart, timePart] = dateString.split(' ');
-            const [day, month, year] = datePart.split('/');
-            const [hours, minutes] = timePart.split(':');
-            // Create date in UTC to avoid timezone issues
-            return new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes)));
+            try {
+                const [datePart, timePart] = dateString.split(' ');
+                const [day, month, year] = datePart.split('/');
+                const [hours, minutes] = timePart ? timePart.split(':') : [0, 0];
+                // Create date in UTC to avoid timezone issues
+                return new Date(Date.UTC(
+                    parseInt(year, 10),
+                    parseInt(month, 10) - 1,
+                    parseInt(day, 10),
+                    parseInt(hours, 10),
+                    parseInt(minutes, 10)
+                ));
+            } catch (error) {
+                console.error(`Error parsing date: ${dateString}`, error);
+                return null;
+            }
         }
 
         function getActivePerks(perks, date) {
