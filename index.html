@@ -7,14 +7,14 @@
     <title>PLU Wallet Checker Home</title>
 </head>
 <body>
-    <nav class="navbar">
-        <a href="index.html">Home</a>
-        <a href="wallet-analyzer.html">PLU Wallet Analyzer</a>
-        <a href="#">Price Checker (Coming Soon)</a>
-        <a href="#">Perks Checker (Coming Soon)</a>
-        <button id="themeToggle">&#x1F319;</button> <!-- Moon icon -->
-    </nav>
-    
+    <div class="navbar">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="wallet-analyzer.html">PLU Wallet Analyzer</a></li>
+            <li><a href="#">Price Checker (Coming Soon)</a></li>
+            <li><a href="#">Perks Checker (Coming Soon)</a></li>
+        </ul>
+    </div>
     <div class="container">
         <h1>Welcome to PLU Wallet Checker</h1>
         <p>Select a tool below:</p>
@@ -23,23 +23,28 @@
             <li><a href="#">Price Checker (Coming Soon)</a></li>
             <li><a href="#">Perks Checker (Coming Soon)</a></li>
         </ul>
+        <div id="darkModeToggle" style="position: absolute; top: 10px; right: 10px;">
+            <span id="moon-icon">🌙</span>
+            <span id="sun-icon" style="display: none;">☀️</span>
+        </div>
     </div>
 
     <script>
-        // Dark mode toggle logic
-        const themeToggle = document.getElementById('themeToggle');
-        const currentTheme = localStorage.getItem('theme');
-        if (currentTheme) {
-            document.body.classList.toggle('dark-mode', currentTheme === 'dark');
+        // Check for saved dark mode preference
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
         }
 
-        themeToggle.addEventListener('click', () => {
+        const toggleDarkMode = () => {
             document.body.classList.toggle('dark-mode');
-            const theme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-            localStorage.setItem('theme', theme);
-            themeToggle.innerHTML = theme === 'dark' ? '&#x1F305;' : '&#x1F319;'; // Sun or Moon icon
-        });
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            document.getElementById('moon-icon').style.display = isDark ? 'none' : 'inline';
+            document.getElementById('sun-icon').style.display = isDark ? 'inline' : 'none';
+        };
+
+        document.getElementById('darkModeToggle').onclick = toggleDarkMode;
     </script>
 </body>
 </html>
- 
