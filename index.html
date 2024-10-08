@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLU Tools</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         :root {
             --bg-color: #f4f7f9;
@@ -104,45 +105,55 @@
 
         .theme-switch {
             display: inline-block;
-            height: 34px;
             position: relative;
             width: 60px;
+            height: 34px;
         }
 
         .theme-switch input {
             display: none;
         }
 
-        .slider {
-            background-color: #ccc;
-            bottom: 0;
-            cursor: pointer;
-            left: 0;
+        .icon-container {
             position: absolute;
-            right: 0;
             top: 0;
-            transition: .4s;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5px;
+            cursor: pointer;
+            background-color: #ccc;
             border-radius: 34px;
+            transition: background-color 0.4s;
         }
 
-        .slider:before {
-            background-color: #fff;
-            bottom: 4px;
-            content: "";
-            height: 26px;
-            left: 4px;
-            position: absolute;
-            transition: .4s;
-            width: 26px;
-            border-radius: 50%;
+        .icon-container i {
+            font-size: 18px;
+            color: #fff;
+            transition: opacity 0.3s;
         }
 
-        input:checked + .slider {
+        .icon-container .fa-sun {
+            opacity: 1;
+        }
+
+        .icon-container .fa-moon {
+            opacity: 0;
+        }
+
+        input:checked + .icon-container {
             background-color: var(--accent-color);
         }
 
-        input:checked + .slider:before {
-            transform: translateX(26px);
+        input:checked + .icon-container .fa-sun {
+            opacity: 0;
+        }
+
+        input:checked + .icon-container .fa-moon {
+            opacity: 1;
         }
 
         .theme-switch-wrapper em {
@@ -155,7 +166,10 @@
     <div class="theme-switch-wrapper">
         <label class="theme-switch" for="checkbox">
             <input type="checkbox" id="checkbox" />
-            <div class="slider"></div>
+            <div class="icon-container">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-moon"></i>
+            </div>
         </label>
         <em>Dark Mode</em>
     </div>
@@ -171,10 +185,10 @@
 
         function switchTheme(e) {
             if (e.target.checked) {
-                document.body.setAttribute('data-theme', 'dark');
+                document.documentElement.setAttribute('data-theme', 'dark');
                 localStorage.setItem('theme', 'dark');
             } else {
-                document.body.setAttribute('data-theme', 'light');
+                document.documentElement.setAttribute('data-theme', 'light');
                 localStorage.setItem('theme', 'light');
             }    
         }
@@ -182,13 +196,15 @@
         toggleSwitch.addEventListener('change', switchTheme, false);
 
         // Set initial theme based on user preference
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
-                document.body.setAttribute('data-theme', savedTheme);
-                toggleSwitch.checked = savedTheme === 'dark';
+        const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+
+        if (currentTheme) {
+            document.documentElement.setAttribute('data-theme', currentTheme);
+
+            if (currentTheme === 'dark') {
+                toggleSwitch.checked = true;
             }
-        });
+        }
     </script>
 </body>
 </html>
