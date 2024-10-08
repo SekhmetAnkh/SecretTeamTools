@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>PLU Wallet Checker Home</title>
+    <title>Welcome to Plutus Team Tools</title>
 </head>
 <body>
     <nav class="navbar">
@@ -40,11 +40,7 @@
             container.classList.toggle('dark-mode');
 
             // Switch icon based on dark mode state
-            if (body.classList.contains('dark-mode')) {
-                darkModeToggle.innerHTML = '☀️'; // Sun icon for light mode
-            } else {
-                darkModeToggle.innerHTML = '🌙'; // Moon icon for dark mode
-            }
+            darkModeToggle.innerHTML = body.classList.contains('dark-mode') ? '☀️' : '🌙';
         };
     </script>
 </body>
