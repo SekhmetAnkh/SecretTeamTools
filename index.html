@@ -13,8 +13,10 @@
             <li><a href="wallet-analyzer.html">PLU Wallet Analyzer</a></li>
             <li><a href="#">Price Checker (Coming Soon)</a></li>
             <li><a href="#">Perks Checker (Coming Soon)</a></li>
-            <li style="float: right;">
-                <button id="darkModeToggle" title="Toggle Dark Mode">🌙</button>
+            <li>
+                <button id="darkModeToggle" aria-label="Toggle dark mode">
+                    🌙
+                </button>
             </li>
         </ul>
     </nav>
@@ -29,28 +31,13 @@
     </div>
 
     <script>
-        // Dark mode toggle functionality
-        const body = document.body;
-        const container = document.querySelector('.container');
-        const darkModeToggle = document.getElementById('darkModeToggle');
+        document.getElementById('darkModeToggle').onclick = function() {
+            const body = document.body;
+            const container = document.querySelector('.container');
 
-        darkModeToggle.onclick = function() {
             body.classList.toggle('dark-mode');
             container.classList.toggle('dark-mode');
-
-            // Save user preference in localStorage
-            if (body.classList.contains('dark-mode')) {
-                localStorage.setItem('darkMode', 'enabled');
-            } else {
-                localStorage.setItem('darkMode', 'disabled');
-            }
         };
-
-        // Check user preference on load
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            body.classList.add('dark-mode');
-            container.classList.add('dark-mode');
-        }
     </script>
 </body>
 </html>
