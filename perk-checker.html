@@ -87,10 +87,25 @@
             // Sort perks by updatedAt date in descending order
             perks.sort((a, b) => b.updatedAt - a.updatedAt);
 
-            // Find the first perk entry that is not after the check date
-            const activePerkEntry = perks.find(perk => perk.updatedAt <= date);
+            // Find active perks for the given date
+            let activePerks = [];
+            for (let i = 0; i < perks.length; i++) {
+                if (perks[i].createdAt <= date && perks[i].updatedAt >= date) {
+                    activePerks = perks[i].perks;
+                    break;
+                }
+            }
 
-            return activePerkEntry ? activePerkEntry.perks : [];
+            // If no active perks found and the date is today or in the future, 
+            // return the most recent 'active' status perks
+            if (activePerks.length === 0 && date >= new Date().setHours(0,0,0,0)) {
+                const activePerkEntry = perks.find(perk => perk.status.toLowerCase() === 'active');
+                if (activePerkEntry) {
+                    activePerks = activePerkEntry.perks;
+                }
+            }
+
+            return activePerks;
         }
 
         function displayResults(activePerksOnDate, activePerksToday, checkDate) {
