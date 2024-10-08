@@ -70,11 +70,11 @@ body {
     margin: 0 auto;
     padding: 20px;
     background-color: var(--card-bg);
-    border-radius: 10px;
     box-shadow: var(--card-shadow);
+    border-radius: 8px;
 }
 
-h1, h2, h3 {
+h1, h2 {
     color: var(--accent-color);
 }
 
@@ -88,42 +88,50 @@ label {
     color: var(--text-color);
 }
 
-input[type="text"], input[type="date"], textarea {
+input[type="text"],
+input[type="number"],
+textarea {
     width: 100%;
     padding: 10px;
-    border: 2px solid var(--input-text);
-    border-radius: 8px;
+    border: 1px solid var(--input-text);
+    border-radius: 4px;
     background-color: var(--input-bg);
     color: var(--input-text);
-    transition: all 0.3s ease;
+    font-size: 16px;
+    box-sizing: border-box;
 }
 
 button {
     background-color: var(--button-bg);
     color: var(--button-text);
-    border: none;
     padding: 10px 20px;
-    border-radius: 8px;
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
 button:hover {
-    opacity: 0.8;
+    background-color: var(--navbar-hover-bg);
 }
 
-#result {
-    margin-top: 20px;
+.fade-in {
+    animation: fadeIn 0.5s;
 }
 
-/* Theme switch styles */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 .theme-switch-wrapper {
     display: flex;
     align-items: center;
     position: fixed;
     top: 10px;
     right: 10px;
-    z-index: 1001; /* Ensure it's above the navbar */
+    z-index: 1001;
 }
 
 .theme-switch {
@@ -184,37 +192,25 @@ input:checked + .icon-container:before {
     right: 8px;
 }
 
-/* Perk Checker specific styles */
-textarea {
+/* Reward Checker specific styles */
+#transaction-input {
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#result {
+    margin-top: 20px;
     padding: 10px;
-    border: 2px solid var(--input-text);
-    border-radius: 8px;
     background-color: var(--input-bg);
-    color: var(--input-text);
-    font-family: 'Roboto', sans-serif;
-    resize: vertical;
+    border-radius: 4px;
+    border: 1px solid var(--input-text);
 }
 
 #result h2 {
-    margin-top: 20px;
-    color: var(--accent-color);
+    margin-top: 0;
 }
 
-#result ul {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-#result li {
-    margin-bottom: 5px;
-    padding: 5px 10px;
-    background-color: var(--card-bg);
-    border-radius: 5px;
-    transition: all 0.3s ease;
-}
-
-#result li:hover {
-    transform: translateX(5px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+#result p {
+    margin: 5px 0;
 }
