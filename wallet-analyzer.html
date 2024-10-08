@@ -7,19 +7,20 @@
     <title>PLU Wallet Analyzer</title>
 </head>
 <body>
-    <nav class="navbar">
+    <nav>
         <ul>
             <li><a href="index.html">Home</a></li>
             <li><a href="wallet-analyzer.html">PLU Wallet Analyzer</a></li>
             <li><a href="#">Price Checker (Coming Soon)</a></li>
             <li><a href="#">Perks Checker (Coming Soon)</a></li>
             <li>
-                <button id="darkModeToggle" aria-label="Toggle dark mode">
-                    🌙
+                <button id="darkModeToggle">
+                    <span id="toggleIcon">🌙</span>
                 </button>
             </li>
         </ul>
     </nav>
+
     <div class="container">
         <h1>PLU Wallet Analyzer</h1>
         <input type="text" id="walletAddress" placeholder="Enter Wallet Address or Etherscan Link">
@@ -29,27 +30,14 @@
     </div>
 
     <script>
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        darkModeToggle.onclick = function() {
-            const body = document.body;
-            const container = document.querySelector('.container');
+        const excludedWallets = [
+            "0xE18F094DDd37f0eB2b651b65C4Aad080aFe90e51"
+        ];
 
-            body.classList.toggle('dark-mode');
-            container.classList.toggle('dark-mode');
-
-            // Switch icon based on dark mode state
-            darkModeToggle.innerHTML = body.classList.contains('dark-mode') ? '☀️' : '🌙';
-        };
+        const withdrawalAddress = "0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd";
 
         document.getElementById('checkButton').onclick = async () => {
-            const input = document.getElementById('walletAddress').value.trim();
-            let walletAddress = input;
-
-            // Extract address from Etherscan link if necessary
-            if (input.startsWith('https://etherscan.io/address/')) {
-                walletAddress = input.split('/').pop().split('#')[0]; // Extract the address from the URL
-            }
-
+            const walletAddress = document.getElementById('walletAddress').value;
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
 
@@ -60,47 +48,57 @@
 
                 let withdrawnPLU = 0;
                 let soldPLU = 0;
-                let redeemedPLU = 0;
                 let incomingPLU = 0;
-
-                // Specify the address for analysis
-                const fromAddress = '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd';
-                const excludedWallets = ["0xE18F094DDd37f0eB2b651b65C4Aad080aFe90e51"];
+                let redeemedPLU = 0;
+                let currentPLU = 0; // Variable to store current balance
 
                 if (data.result.length > 0) {
                     data.result.forEach(tx => {
                         const value = parseFloat(tx.value) / 1e18; // Convert from wei to PLU
-                        if (tx.from.toLowerCase() === fromAddress.toLowerCase()) {
-                            withdrawnPLU += value; // Count received amounts
-                        } else if (tx.from.toLowerCase() === walletAddress.toLowerCase() && !excludedWallets.includes(tx.to)) {
-                            soldPLU += value; // Count outgoing amounts excluding the redemption wallet
+                        if (tx.from === withdrawalAddress) {
+                            withdrawnPLU += value; // Count amounts received from the withdrawal address
                         } else if (excludedWallets.includes(tx.to)) {
                             redeemedPLU += value; // Count redeemed amounts
-                        } else if (tx.to.toLowerCase() === walletAddress.toLowerCase()) {
+                        } else if (tx.from !== walletAddress) {
                             incomingPLU += value; // Count incoming amounts from other wallets
+                        } else {
+                            soldPLU += value; // Count outgoing amounts
                         }
                     });
+
+                    // Calculate the current balance
+                    currentPLU = withdrawnPLU + incomingPLU - soldPLU - redeemedPLU;
                 }
 
-                // Calculate current balance: Current balance = Withdrawn - Sold + Incoming
-                const currentBalance = withdrawnPLU - soldPLU + incomingPLU;
-
-                // Calculate percentage sold
-                const percentageSold = (soldPLU / (withdrawnPLU || 1)) * 100; // Avoid division by zero
+                // Calculate the percentage sold
+                const totalReceived = withdrawnPLU + incomingPLU;
+                const percentageSold = totalReceived > 0 ? (soldPLU / totalReceived * 100).toFixed(2) : '0.00';
 
                 // Display results
                 resultsDiv.innerHTML = `
-                    <p><strong>Withdrawn PLU:</strong> ${withdrawnPLU.toFixed(4)}</p>
-                    <p><strong>Sold PLU:</strong> ${soldPLU.toFixed(4)}</p>
-                    <p><strong>Current PLU Balance:</strong> ${currentBalance.toFixed(4)}</p>
-                    <p><strong>Incoming PLU from other wallets:</strong> ${incomingPLU.toFixed(4)}</p>
-                    <p><strong>Percentage Sold:</strong> ${percentageSold.toFixed(2)}%</p>
-                    <p><strong>Redeemed PLU:</strong> ${redeemedPLU.toFixed(4)}</p>
+                    <p>Withdrawn PLU: ${withdrawnPLU.toFixed(4)}</p>
+                    <p>Sold PLU: ${soldPLU.toFixed(4)}</p>
+                    <p>Percentage Sold: ${percentageSold}%</p>
+                    <p>Redeemed PLU: ${redeemedPLU.toFixed(4)}</p>
+                    <h2>Incoming PLU from other wallets: ${incomingPLU.toFixed(4)}</h2>
+                    <p>Current PLU Balance: ${currentPLU.toFixed(4)}</p>
                 `;
             } catch (error) {
                 console.error('Error fetching transaction data:', error);
-                resultsDiv.innerHTML = `<p style="color: red;">Error fetching data. Please check the wallet address and try again.</p>`;
+                resultsDiv.innerHTML = `<p>Error fetching data. Please try again.</p>`;
             }
+        };
+
+        // Dark Mode Toggle
+        const toggleButton = document.getElementById('darkModeToggle');
+        const body = document.body;
+        const container = document.querySelector('.container');
+
+        toggleButton.onclick = function() {
+            body.classList.toggle('dark-mode');
+            container.classList.toggle('dark-mode');
+            const icon = document.getElementById('toggleIcon');
+            icon.textContent = body.classList.contains('dark-mode') ? '🌞' : '🌙'; // Switch between sun and moon icons
         };
     </script>
 </body>
