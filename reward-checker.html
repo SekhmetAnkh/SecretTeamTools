@@ -50,7 +50,7 @@
 
             try {
                 const transaction = parseTransactionData(transactionInput);
-                const pluPrice = await fetchPluPrice(transaction.currency);
+                const pluPrice = await fetchHistoricalPluPrice(transaction.date, transaction.currency);
                 const reward = calculateReward(transaction.amount, pluPrice);
 
                 resultDiv.innerHTML = `
@@ -58,7 +58,7 @@
                     <p>Transaction Amount: ${transaction.amount} ${transaction.currency}</p>
                     <p>Description: ${transaction.description}</p>
                     <p>Date: ${transaction.date}</p>
-                    <p>PLU Price: ${pluPrice.toFixed(2)} ${transaction.currency}</p>
+                    <p>PLU Price on ${transaction.date}: ${pluPrice.toFixed(2)} ${transaction.currency}</p>
                     <p>Cashback: ${reward.cashback.toFixed(2)} ${transaction.currency}</p>
                     <p>PLU Reward: ${reward.pluReward.toFixed(4)} PLU</p>
                 `;
@@ -81,22 +81,31 @@
             };
         }
 
-        async function fetchPluPrice(currency) {
+        async function fetchHistoricalPluPrice(dateString, currency) {
             try {
-                const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=pluton&vs_currencies=${currency.toLowerCase()}`);
+                const date = new Date(dateString);
+                const timestamp = Math.floor(date.getTime() / 1000);
+                const response = await fetch(`https://api.coingecko.com/api/v3/coins/pluton/history?date=${formatDate(date)}&localization=false`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                const price = data.pluton[currency.toLowerCase()];
+                const price = data.market_data.current_price[currency.toLowerCase()];
                 if (!price) {
-                    throw new Error(`Unable to fetch PLU price for ${currency}`);
+                    throw new Error(`Unable to fetch PLU price for ${currency} on ${dateString}`);
                 }
                 return price;
             } catch (error) {
-                console.error('Error fetching PLU price:', error);
-                throw new Error('Failed to fetch PLU price. Please try again later.');
+                console.error('Error fetching historical PLU price:', error);
+                throw new Error('Failed to fetch historical PLU price. Please try again later.');
             }
+        }
+
+        function formatDate(date) {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
         }
 
         function calculateReward(amount, pluPrice) {
