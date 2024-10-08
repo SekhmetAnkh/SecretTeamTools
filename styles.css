@@ -5,8 +5,9 @@ body {
     padding: 0; /* Remove default padding */
     height: 100vh; /* Full height of the viewport */
     display: flex; /* Use flexbox for centering */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
     transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
 }
 
@@ -15,11 +16,39 @@ body {
     color: #f4f4f4; /* Light text color */
 }
 
+.navbar {
+    width: 100%; /* Full width for navbar */
+    background-color: #fff; /* White background */
+    padding: 10px 20px; /* Padding for navbar */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for navbar */
+    position: fixed; /* Fix navbar at the top */
+    top: 0; /* Align to top */
+    left: 0; /* Align to left */
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space out links */
+    align-items: center; /* Center items vertically */
+    z-index: 1000; /* Ensure it stays above other content */
+}
+
+.navbar a {
+    color: #333; /* Link color */
+    text-decoration: none; /* Remove underline */
+    font-weight: bold; /* Bold links */
+    margin: 0 15px; /* Space between links */
+}
+
+.dark-mode .navbar {
+    background-color: #444; /* Dark background for navbar */
+}
+
+.dark-mode .navbar a {
+    color: #f4f4f4; /* Light link color in dark mode */
+}
+
 .container {
-    position: relative; /* Add relative positioning */
     max-width: 600px;
     width: 100%; /* Make the container responsive */
-    margin: 20px; /* Add margin for smaller screens */
+    margin: 70px 20px 20px; /* Space for fixed navbar */
     background: white; /* Light background for container */
     padding: 20px;
     border-radius: 8px;
@@ -29,22 +58,6 @@ body {
 
 .dark-mode .container {
     background: #444; /* Dark background for container */
-}
-
-.navbar {
-    display: flex;
-    justify-content: space-around; /* Space out navigation links */
-    margin-bottom: 20px; /* Space below the navbar */
-}
-
-.navbar a {
-    color: #333; /* Link color */
-    text-decoration: none; /* Remove underline */
-    font-weight: bold; /* Bold links */
-}
-
-.dark-mode .navbar a {
-    color: #f4f4f4; /* Light link color in dark mode */
 }
 
 h1 {
@@ -102,9 +115,6 @@ button:hover {
 }
 
 #themeToggle {
-    position: absolute; /* Position button absolutely */
-    top: 10px; /* Distance from the top */
-    right: 10px; /* Distance from the right */
     background: none; /* Remove default button styles */
     border: none; /* Remove border */
     font-size: 1.5em; /* Increase font size for visibility */
