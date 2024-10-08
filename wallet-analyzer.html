@@ -7,13 +7,15 @@
     <title>PLU Wallet Analyzer</title>
 </head>
 <body>
+    <nav class="navbar">
+        <a href="index.html">Home</a>
+        <a href="wallet-analyzer.html">PLU Wallet Analyzer</a>
+        <a href="#">Price Checker (Coming Soon)</a>
+        <a href="#">Perks Checker (Coming Soon)</a>
+        <button id="themeToggle">&#x1F319;</button> <!-- Moon icon -->
+    </nav>
+
     <div class="container">
-        <nav class="navbar">
-            <a href="index.html">Home</a>
-            <a href="wallet-analyzer.html">PLU Wallet Analyzer</a>
-            <a href="#">Price Checker (Coming Soon)</a>
-            <a href="#">Perks Checker (Coming Soon)</a>
-        </nav>
         <h1>PLU Wallet Analyzer</h1>
         <input type="text" id="walletAddress" placeholder="Enter Wallet Address">
         <button id="checkButton">Check Wallet</button>
@@ -24,7 +26,6 @@
             <h2>Exclusions</h2>
             <p>Total $PLU Redeemed: <span id="redeemedTotal">0</span></p>
         </div>
-        <button id="themeToggle">&#x1F319;</button> <!-- Moon icon -->
     </div>
 
     <script>
