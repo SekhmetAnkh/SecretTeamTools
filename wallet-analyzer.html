@@ -53,7 +53,7 @@
             }
 
             // Try to extract address from Etherscan URL
-            const urlPattern = /(?:https?:\/\/)?(?:www\.)?etherscan\.io\/(?:address|token)\/([a-fA-F0-9]{40})/i;
+            const urlPattern = /(?:https?:\/\/)?(?:www\.)?etherscan\.io\/(?:address|token)\/([a-fA-F0-9]{40})(?:#tokentxns)?/i;
             const match = input.match(urlPattern);
             if (match) {
                 return '0x' + match[1];
