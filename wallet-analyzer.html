@@ -42,7 +42,14 @@
         };
 
         document.getElementById('checkButton').onclick = async () => {
-            const walletAddress = document.getElementById('walletAddress').value;
+            const input = document.getElementById('walletAddress').value.trim();
+            let walletAddress = input;
+
+            // Extract address from Etherscan link if necessary
+            if (input.startsWith('https://etherscan.io/address/')) {
+                walletAddress = input.split('/').pop().split('#')[0]; // Extract the address from the URL
+            }
+
             const resultsDiv = document.getElementById('results');
             resultsDiv.innerHTML = '';
 
