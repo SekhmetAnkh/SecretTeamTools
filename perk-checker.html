@@ -47,13 +47,16 @@
     <script>
         function checkPerks() {
             const perkListInput = document.getElementById('perk-list').value;
-            const checkDate = new Date(document.getElementById('check-date').value);
+            const checkDateInput = document.getElementById('check-date').value;
             const resultDiv = document.getElementById('result');
 
-            if (isNaN(checkDate.getTime())) {
+            if (!checkDateInput) {
                 resultDiv.innerHTML = 'Please enter a valid date.';
                 return;
             }
+
+            const [year, month, day] = checkDateInput.split('-');
+            const checkDate = new Date(Date.UTC(year, month - 1, day));
 
             const perks = parsePerkList(perkListInput);
 
@@ -85,15 +88,18 @@
 
         function parseDate(dateString) {
             const [day, month, year, time] = dateString.split(/[/ :]/);
-            return new Date(`${year}-${month}-${day}T${time}`);
+            const [hours, minutes] = time.split(':');
+            // Create date in UTC to avoid timezone issues
+            return new Date(Date.UTC(year, month - 1, day, hours, minutes));
         }
 
         function getActivePerks(perks, date) {
             const now = new Date();
-            now.setHours(0, 0, 0, 0);  // Set to start of today
+            const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+            const checkDateUTC = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 
             // If the date is in the future, return an error
-            if (date > now) {
+            if (checkDateUTC > todayUTC) {
                 throw new Error("Future date selected. Please choose a date in the past or today.");
             }
 
@@ -102,7 +108,7 @@
 
             // For past dates and today, find the applicable perk entry
             for (let i = 0; i < perks.length; i++) {
-                if (perks[i].createdAt <= date && perks[i].updatedAt >= date) {
+                if (perks[i].createdAt <= checkDateUTC && perks[i].updatedAt >= checkDateUTC) {
                     return perks[i].perks;
                 }
             }
