@@ -8,15 +8,18 @@
 <body>
     <h1>Wallet Analyzer</h1>
     <form id="walletForm">
-        <label for="walletAddress">Enter Wallet Address or Etherscan Link:</label>
+        <label for="walletAddress">Enter Wallet Address:</label>
         <input type="text" id="walletAddress" required>
         <button type="submit">Analyze</button>
     </form>
     <div id="results">
         <p id="withdrawnPLU"></p>
         <p id="soldPLU"></p>
-        <p id="percentageSold"></p>
         <p id="redeemedPLU"></p>
+        <p id="currentBalance"></p>
+        <p id="percentageSold"></p>
+        <p id="incomingPLU"></p> <!-- Field for incoming PLU -->
+        <p id="percentageWithdrawnSold"></p> <!-- Field for percentage of withdrawn PLU sold -->
     </div>
 
     <script>
@@ -28,40 +31,72 @@
 
         async function analyzeWallet(walletAddress) {
             try {
-                const withdrawnPLU = await fetchWithdrawnPLU(walletAddress);
-                const soldPLU = await fetchSoldPLU(walletAddress);
-                const redeemedPLU = await fetchRedeemedPLU(walletAddress);
-                
-                const percentageSold = ((soldPLU / withdrawnPLU) * 100).toFixed(2);
+                const apiKey = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH'; // Your Etherscan API key
+                const withdrawalWalletAddress = '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd';
+                const transactionsResponse = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${walletAddress}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`);
+                const transactionsData = await transactionsResponse.json();
+                const transactions = transactionsData.result;
 
+                // Initialize values
+                let withdrawnPLU = 0;
+                let redeemedPLU = await fetchRedeemedPLU(walletAddress); // Fetch redeemed PLU
+                let incomingPLU = 0;
+                let soldPLU = 0;
+
+                // Process user transactions
+                transactions.forEach(tx => {
+                    // Check for incoming PLU from the withdrawal wallet
+                    if (tx.from.toLowerCase() === withdrawalWalletAddress.toLowerCase() && tx.to.toLowerCase() === walletAddress.toLowerCase()) {
+                        withdrawnPLU += parseFloat(tx.value) / Math.pow(10, 18); // Adjust based on token decimals
+                    }
+
+                    // Calculate incoming PLU from other addresses
+                    if (tx.to.toLowerCase() === walletAddress.toLowerCase()) {
+                        incomingPLU += parseFloat(tx.value) / Math.pow(10, 18); // Adjust based on token decimals
+                    } 
+                    // Calculate sold PLU
+                    else if (tx.from.toLowerCase() === walletAddress.toLowerCase()) {
+                        soldPLU += parseFloat(tx.value) / Math.pow(10, 18); // Adjust based on token decimals
+                    }
+                });
+
+                // Calculate the current balance
+                const currentBalance = withdrawnPLU - soldPLU - redeemedPLU;
+
+                // Calculate percentage sold
+                const percentageSold = ((soldPLU / withdrawnPLU) * 100).toFixed(2);
+                const percentageWithdrawnSold = ((soldPLU / (withdrawnPLU - redeemedPLU)) * 100).toFixed(2); // Percentage of withdrawn PLU sold
+
+                // Display results
                 document.getElementById('withdrawnPLU').innerText = `Withdrawn PLU: ${withdrawnPLU}`;
                 document.getElementById('soldPLU').innerText = `Sold PLU: ${soldPLU}`;
-                document.getElementById('percentageSold').innerText = `Percentage Sold: ${percentageSold}%`;
                 document.getElementById('redeemedPLU').innerText = `Redeemed PLU: ${redeemedPLU}`;
+                document.getElementById('currentBalance').innerText = `Current Balance: ${currentBalance} PLU`;
+                document.getElementById('percentageSold').innerText = `Percentage Sold: ${percentageSold}%`;
+                document.getElementById('incomingPLU').innerText = `Incoming PLU from Other Addresses: ${incomingPLU}`;
+                document.getElementById('percentageWithdrawnSold').innerText = `Percentage of Withdrawn PLU Sold: ${percentageWithdrawnSold}%`;
             } catch (error) {
                 console.error('Error analyzing wallet:', error);
             }
         }
 
-        async function fetchWithdrawnPLU(walletAddress) {
-            // Replace with actual API call logic
-            const response = await fetch(`https://api.example.com/withdrawnPLU/${walletAddress}`);
-            const data = await response.json();
-            return data.withdrawnPLU; // Adjust according to API response structure
-        }
-
-        async function fetchSoldPLU(walletAddress) {
-            // Replace with actual API call logic
-            const response = await fetch(`https://api.example.com/soldPLU/${walletAddress}`);
-            const data = await response.json();
-            return data.soldPLU; // Adjust according to API response structure
-        }
-
         async function fetchRedeemedPLU(walletAddress) {
-            // Replace with actual API call logic
-            const response = await fetch(`https://api.example.com/redeemedPLU/${walletAddress}`);
-            const data = await response.json();
-            return data.redeemedPLU; // Adjust according to API response structure
+            const redeemWalletAddress = '0xE18F094DDd37f0eB2b651b65C4Aad080aFe90e51';
+            const apiKey = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH'; // Your Etherscan API key
+            const transactionsResponse = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${redeemWalletAddress}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`);
+            const transactionsData = await transactionsResponse.json();
+            const transactions = transactionsData.result;
+
+            let redeemedPLU = 0;
+
+            // Calculate total PLU sent to the redeem wallet
+            transactions.forEach(tx => {
+                if (tx.from.toLowerCase() === walletAddress.toLowerCase()) {
+                    redeemedPLU += parseFloat(tx.value) / Math.pow(10, 18); // Adjust based on token decimals
+                }
+            });
+
+            return redeemedPLU;
         }
     </script>
 </body>
