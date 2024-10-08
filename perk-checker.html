@@ -95,10 +95,19 @@
         }
 
         function parseDate(dateString) {
+            if (!dateString) return null;
             const [day, month, year, time] = dateString.split(/[/ :]/);
             const [hours, minutes] = time.split(':');
             // Create date in UTC to avoid timezone issues
-            return new Date(Date.UTC(year, month - 1, day, hours, minutes));
+            const date = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes)));
+            
+            // Check if the date is valid
+            if (isNaN(date.getTime())) {
+                console.error(`Invalid date: ${dateString}`);
+                return null;
+            }
+            
+            return date;
         }
 
         function getActivePerks(perks, date) {
@@ -112,11 +121,12 @@
             }
 
             // Sort perks by createdAt date in descending order
-            perks.sort((a, b) => b.createdAt - a.createdAt);
+            perks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
             // For past dates and today, find the applicable perk entry
             for (let i = 0; i < perks.length; i++) {
-                if (perks[i].createdAt <= checkDateUTC && perks[i].updatedAt >= checkDateUTC) {
+                if (perks[i].createdAt && perks[i].updatedAt &&
+                    perks[i].createdAt <= checkDateUTC && perks[i].updatedAt >= checkDateUTC) {
                     return perks[i].perks;
                 }
             }
