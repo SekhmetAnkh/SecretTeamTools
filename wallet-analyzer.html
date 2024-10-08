@@ -5,7 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLU Wallet Analyzer</title>
     <style>
-        /* ... (styles remain unchanged) ... */
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --input-bg: #f0f0f0;
+            --input-text: #333333;
+            --button-bg: #4CAF50;
+            --button-text: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #333333;
+            --text-color: #ffffff;
+            --input-bg: #555555;
+            --input-text: #ffffff;
+            --button-bg: #45a049;
+            --button-text: #ffffff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* ... (keep other styles, updating colors to use CSS variables) ... */
+
+        .input-group input {
+            background-color: var(--input-bg);
+            color: var(--input-text);
+        }
+
+        .input-group button {
+            background-color: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        /* ... (keep other styles, updating colors to use CSS variables) ... */
     </style>
 </head>
 <body>
@@ -97,6 +136,16 @@
         const themeToggle = document.getElementById('theme-toggle');
         themeToggle.addEventListener('change', () => {
             document.body.setAttribute('data-theme', themeToggle.checked ? 'dark' : 'light');
+            localStorage.setItem('theme', themeToggle.checked ? 'dark' : 'light');
+        });
+
+        // Set initial theme based on user preference
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.body.setAttribute('data-theme', savedTheme);
+                themeToggle.checked = savedTheme === 'dark';
+            }
         });
     </script>
 </body>
