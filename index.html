@@ -31,12 +31,20 @@
     </div>
 
     <script>
-        document.getElementById('darkModeToggle').onclick = function() {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.onclick = function() {
             const body = document.body;
             const container = document.querySelector('.container');
 
             body.classList.toggle('dark-mode');
             container.classList.toggle('dark-mode');
+
+            // Switch icon based on dark mode state
+            if (body.classList.contains('dark-mode')) {
+                darkModeToggle.innerHTML = '☀️'; // Sun icon for light mode
+            } else {
+                darkModeToggle.innerHTML = '🌙'; // Moon icon for dark mode
+            }
         };
     </script>
 </body>
