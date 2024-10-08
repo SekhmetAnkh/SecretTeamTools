@@ -116,7 +116,13 @@
             // Sort perks by createdAt date in descending order
             perks.sort((a, b) => b.createdAt - a.createdAt);
 
-            // For past dates and today, find the applicable perk entry
+            // For today or future dates, return the most recent 'active' perks
+            if (checkDateUTC >= todayUTC) {
+                const activePerk = perks.find(perk => perk.status.toLowerCase() === 'active');
+                return activePerk ? activePerk.perks : [];
+            }
+
+            // For past dates, find the applicable perk entry
             for (let i = 0; i < perks.length; i++) {
                 if (perks[i].createdAt <= checkDateUTC && perks[i].updatedAt >= checkDateUTC) {
                     return perks[i].perks;
@@ -135,8 +141,10 @@
             let resultHTML = `<h2>Active Perks on ${checkDateString}:</h2>`;
             resultHTML += generatePerkList(activePerksOnDate);
 
-            resultHTML += `<h2>Active Perks Today (${todayString}):</h2>`;
-            resultHTML += generatePerkList(activePerksToday);
+            if (checkDate.toDateString() !== new Date().toDateString()) {
+                resultHTML += `<h2>Active Perks Today (${todayString}):</h2>`;
+                resultHTML += generatePerkList(activePerksToday);
+            }
 
             resultDiv.innerHTML = resultHTML;
         }
