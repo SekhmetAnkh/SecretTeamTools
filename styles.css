@@ -157,6 +157,7 @@ input:checked + .icon-container:before {
     border-radius: 10px;
     box-shadow: var(--card-shadow);
     transition: all 0.3s ease;
+    box-sizing: border-box; /* Add this line */
 }
 
 .container:hover {
@@ -166,6 +167,7 @@ input:checked + .icon-container:before {
 
 .input-group {
     margin-bottom: 20px;
+    width: 100%; /* Add this line */
 }
 
 label {
@@ -182,6 +184,7 @@ input[type="text"] {
     background-color: var(--input-bg);
     color: var(--input-text);
     transition: all 0.3s ease;
+    box-sizing: border-box; /* Add this line */
 }
 
 input[type="text"]:focus {

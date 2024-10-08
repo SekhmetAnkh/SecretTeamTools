@@ -54,16 +54,12 @@
             try {
                 const balance = await getTokenBalance(walletAddress);
                 const transactions = await getTokenTransactions(walletAddress);
-                const withdrawals = calculateWithdrawals(transactions);
+                const receivedFromWithdrawal = calculateReceivedFromWithdrawal(transactions);
 
                 resultDiv.innerHTML = `
                     <h2>Wallet Analysis Results:</h2>
-                    <p>PLU Balance: ${balance} PLU</p>
-                    <p>Total Withdrawals: ${withdrawals} PLU</p>
-                    <h3>Recent Transactions:</h3>
-                    <ul>
-                        ${transactions.slice(0, 5).map(tx => `<li>${tx.from} sent ${tx.value} PLU to ${tx.to}</li>`).join('')}
-                    </ul>
+                    <p>Current PLU Balance: ${balance.toFixed(2)} PLU</p>
+                    <p>Total PLU Received from Withdrawal Wallet: ${receivedFromWithdrawal.toFixed(2)} PLU</p>
                 `;
             } catch (error) {
                 resultDiv.innerHTML = `Error: ${error.message}`;
@@ -88,9 +84,9 @@
             }));
         }
 
-        function calculateWithdrawals(transactions) {
+        function calculateReceivedFromWithdrawal(transactions) {
             return transactions
-                .filter(tx => tx.to.toLowerCase() === WITHDRAWAL_WALLET.toLowerCase())
+                .filter(tx => tx.from.toLowerCase() === WITHDRAWAL_WALLET.toLowerCase())
                 .reduce((total, tx) => total + tx.value, 0);
         }
     </script>
