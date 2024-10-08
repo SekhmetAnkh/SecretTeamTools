@@ -8,22 +8,26 @@
     --accent-color: #2ecc71;
     --navbar-bg: #333;
     --navbar-text: #f2f2f2;
-    --navbar-hover-bg: #ddd;
-    --navbar-hover-text: #000;
+    --navbar-hover-bg: #4a90e2;
+    --navbar-hover-text: #ffffff;
+    --card-bg: #ffffff;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="dark"] {
-    --bg-color: #2c3e50;
-    --text-color: #ecf0f1;
-    --input-bg: #34495e;
-    --input-text: #ecf0f1;
-    --button-bg: #3498db;
+    --bg-color: #1a1a2e;
+    --text-color: #e0e0e0;
+    --input-bg: #16213e;
+    --input-text: #e0e0e0;
+    --button-bg: #4a90e2;
     --button-text: #ffffff;
     --accent-color: #2ecc71;
-    --navbar-bg: #1a242f;
-    --navbar-text: #ecf0f1;
-    --navbar-hover-bg: #34495e;
-    --navbar-hover-text: #ecf0f1;
+    --navbar-bg: #0f3460;
+    --navbar-text: #e0e0e0;
+    --navbar-hover-bg: #4a90e2;
+    --navbar-hover-text: #ffffff;
+    --card-bg: #16213e;
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 body {
@@ -44,6 +48,7 @@ body {
     top: 0;
     width: 100%;
     z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar a {
@@ -53,17 +58,28 @@ body {
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
+    transition: all 0.3s ease;
 }
 
 .navbar a:hover {
     background-color: var(--navbar-hover-bg);
     color: var(--navbar-hover-text);
+    transform: translateY(-2px);
 }
 
 .content {
     padding: 20px;
     max-width: 800px;
     margin: 0 auto;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+}
+
+.content:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .theme-switch-wrapper {
@@ -122,6 +138,7 @@ input:checked + .icon-container:before {
     font-size: 18px;
     position: absolute;
     top: 8px;
+    transition: all 0.3s ease;
 }
 
 .fa-moon {
@@ -136,6 +153,15 @@ input:checked + .icon-container:before {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .input-group {
@@ -145,30 +171,86 @@ input:checked + .icon-container:before {
 label {
     display: block;
     margin-bottom: 5px;
+    font-weight: bold;
 }
 
 input[type="text"] {
     width: 100%;
     padding: 10px;
-    border: 1px solid var(--input-text);
-    border-radius: 4px;
+    border: 2px solid var(--input-text);
+    border-radius: 8px;
     background-color: var(--input-bg);
     color: var(--input-text);
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
 }
 
 button {
     background-color: var(--button-bg);
     color: var(--button-text);
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 button:hover {
-    opacity: 0.8;
+    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 #result {
     margin-top: 20px;
+    padding: 20px;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+}
+
+#result:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+h1, h2, h3 {
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: var(--input-bg);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+li:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
 }

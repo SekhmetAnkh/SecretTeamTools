@@ -7,6 +7,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script>
+        // Immediately set the theme to prevent flash
+        let theme = localStorage.getItem('theme');
+        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -21,9 +26,9 @@
         </label>
     </div>
 
-    <h1>PLU Wallet Analyzer</h1>
+    <div class="container fade-in">
+        <h1>PLU Wallet Analyzer</h1>
 
-    <div class="container">
         <div class="input-group">
             <label for="wallet-address">Wallet Address:</label>
             <input type="text" id="wallet-address" placeholder="Enter wallet address">
