@@ -45,9 +45,18 @@
             </select>
         </div>
         <div class="input-group">
+            <label for="metal-tier">Metal Tier:</label>
+            <select id="metal-tier">
+                <option value="10">Not Metal</option>
+                <option value="20">Champion</option>
+                <option value="30">Master</option>
+                <option value="50">Grandmaster</option>
+            </select>
+        </div>
+        <div class="input-group">
             <label>
                 <input type="checkbox" id="is-perk" />
-                Is this a Perk reward? (100% cashback up to 10 EUR/GBP, then selected tier)
+                Is this a Perk reward? (100% cashback up to perk cap, then selected tier)
             </label>
         </div>
         <div class="input-group">
@@ -60,19 +69,19 @@
     <script src="theme-switch.js"></script>
     <script>
         const PERK_CASHBACK_RATE = 1; // 100% cashback for Perk
-        const PERK_CASHBACK_LIMIT = 10; // 10 EUR/GBP limit for Perk
 
         async function checkRewards() {
             const transactionInput = document.getElementById('transaction-input').value;
             const isPerk = document.getElementById('is-perk').checked;
             const cashbackTier = parseFloat(document.getElementById('cashback-tier').value);
+            const perkCashbackLimit = parseFloat(document.getElementById('metal-tier').value);
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = 'Calculating rewards...';
 
             try {
                 const transactions = parseTransactionData(transactionInput);
-                const results = await Promise.all(transactions.map(transaction => processTransaction(transaction, isPerk, cashbackTier)));
-                displayResults(results, resultDiv, cashbackTier);
+                const results = await Promise.all(transactions.map(transaction => processTransaction(transaction, isPerk, cashbackTier, perkCashbackLimit)));
+                displayResults(results, resultDiv, cashbackTier, perkCashbackLimit);
             } catch (error) {
                 resultDiv.innerHTML = `Error: ${error.message}`;
                 console.error('Full error details:', error);
@@ -98,9 +107,9 @@
             });
         }
 
-        async function processTransaction(transaction, isPerk, cashbackTier) {
+        async function processTransaction(transaction, isPerk, cashbackTier, perkCashbackLimit) {
             const pluPrice = await getPluPrice(transaction.date, transaction.currency);
-            const reward = calculateReward(transaction.amount, pluPrice, isPerk, cashbackTier, transaction.currency);
+            const reward = calculateReward(transaction.amount, pluPrice, isPerk, cashbackTier, perkCashbackLimit, transaction.currency);
             return { ...transaction, pluPrice, ...reward, isPerk };
         }
 
@@ -164,14 +173,14 @@
             }
         }
 
-        function calculateReward(amount, pluPrice, isPerk, cashbackTier, currency) {
+        function calculateReward(amount, pluPrice, isPerk, cashbackTier, perkCashbackLimit, currency) {
             let cashback, perkCashback = 0, standardCashback = 0;
             if (isPerk) {
-                if (amount <= PERK_CASHBACK_LIMIT) {
+                if (amount <= perkCashbackLimit) {
                     perkCashback = amount;
                 } else {
-                    perkCashback = PERK_CASHBACK_LIMIT;
-                    standardCashback = (amount - PERK_CASHBACK_LIMIT) * cashbackTier;
+                    perkCashback = perkCashbackLimit;
+                    standardCashback = (amount - perkCashbackLimit) * cashbackTier;
                 }
                 cashback = perkCashback + standardCashback;
             } else {
@@ -184,9 +193,11 @@
             return { cashback, perkCashback, standardCashback, pluReward, perkPluReward, standardPluReward };
         }
 
-        function displayResults(results, resultDiv, cashbackTier) {
+        function displayResults(results, resultDiv, cashbackTier, perkCashbackLimit) {
             let html = '<h2 class="results-title">Reward Calculation Results</h2>';
             html += `<p><strong>Cashback Tier:</strong> ${(cashbackTier * 100).toFixed(0)}%</p>`;
+            html += `<p><strong>Perk Cashback Limit:</strong> ${perkCashbackLimit} ${results[0].currency}</p>`;
+            
             results.forEach((result, index) => {
                 html += `
                     <div class="result-item">
