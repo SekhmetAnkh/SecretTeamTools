@@ -345,3 +345,76 @@ input:checked + .icon-container:before {
     outline: none;
     box-shadow: 0 0 0 2px var(--accent-color);
 }
+
+/* Add these styles to your existing styles.css file */
+
+.date-input-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.date-input-wrapper input {
+    padding-right: 30px;
+}
+
+.date-input-wrapper i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color);
+    pointer-events: none;
+}
+
+/* Flatpickr custom styles */
+.flatpickr-calendar {
+    background: var(--card-bg);
+    border-color: var(--input-text);
+    box-shadow: var(--card-shadow);
+}
+
+.flatpickr-day {
+    color: var(--text-color);
+}
+
+.flatpickr-day.selected {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.flatpickr-day.today {
+    border-color: var(--accent-color);
+}
+
+.flatpickr-months .flatpickr-month {
+    color: var(--text-color);
+    fill: var(--text-color);
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    color: var(--text-color);
+}
+
+.flatpickr-current-month input.cur-year {
+    color: var(--text-color);
+}
+
+.flatpickr-weekdays {
+    color: var(--text-color);
+}
+
+.flatpickr-weekday {
+    color: var(--text-color);
+}
+
+.flatpickr-time input {
+    color: var(--text-color);
+}
+
+.flatpickr-time .flatpickr-time-separator {
+    color: var(--text-color);
+}
+
+.flatpickr-am-pm {
+    color: var(--text-color);
+}

@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script>
         let theme = localStorage.getItem('theme');
         if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
@@ -34,7 +36,10 @@
         </div>
         <div class="input-group">
             <label for="check-date">Check Date:</label>
-            <input type="date" id="check-date">
+            <div class="date-input-wrapper">
+                <input type="text" id="check-date" placeholder="Select a date">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
         </div>
         <div class="input-group">
             <button onclick="checkPerks()" class="btn-primary">Check Perks</button>
@@ -45,6 +50,13 @@
     <script src="load-navbar.js"></script>
     <script src="theme-switch.js"></script>
     <script>
+        // Initialize Flatpickr
+        flatpickr("#check-date", {
+            dateFormat: "Y-m-d",
+            maxDate: "today",
+            allowInput: true,
+        });
+
         function checkPerks() {
             const perkListInput = document.getElementById('perk-list').value;
             const checkDateInput = document.getElementById('check-date').value;
