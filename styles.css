@@ -418,3 +418,50 @@ input:checked + .icon-container:before {
 .flatpickr-am-pm {
     color: var(--text-color);
 }
+
+.results-title, .summary-title {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.transaction-title {
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+}
+
+.result-item {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--card-shadow);
+}
+
+.transaction-details, .reward-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.transaction-details p, .reward-details p {
+    margin: 5px 0;
+}
+
+.result-summary {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.result-summary p {
+    margin: 10px 0;
+    font-size: 1.1em;
+}
+
+strong {
+    color: var(--primary-color);
+}

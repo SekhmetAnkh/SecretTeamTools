@@ -153,45 +153,62 @@
         }
 
         function calculateReward(amount, pluPrice, isPerk, currency) {
-            let cashback;
+            let cashback, perkCashback = 0, standardCashback = 0;
             if (isPerk) {
                 if (amount <= PERK_CASHBACK_LIMIT) {
-                    cashback = amount;
+                    perkCashback = amount;
                 } else {
-                    cashback = PERK_CASHBACK_LIMIT + (amount - PERK_CASHBACK_LIMIT) * STANDARD_CASHBACK_RATE;
+                    perkCashback = PERK_CASHBACK_LIMIT;
+                    standardCashback = (amount - PERK_CASHBACK_LIMIT) * STANDARD_CASHBACK_RATE;
                 }
+                cashback = perkCashback + standardCashback;
             } else {
-                cashback = amount * STANDARD_CASHBACK_RATE;
+                standardCashback = amount * STANDARD_CASHBACK_RATE;
+                cashback = standardCashback;
             }
             const pluReward = cashback / pluPrice;
-            return { cashback, pluReward };
+            return { cashback, perkCashback, standardCashback, pluReward };
         }
 
         function displayResults(results, resultDiv) {
-            let html = '<h2>Reward Calculation Results:</h2>';
+            let html = '<h2 class="results-title">Reward Calculation Results</h2>';
             results.forEach((result, index) => {
                 html += `
                     <div class="result-item">
-                        <h3>Transaction ${index + 1}</h3>
-                        <p>Amount: ${result.amount.toFixed(2)} ${result.currency}</p>
-                        <p>Description: ${result.description}</p>
-                        <p>Date: ${result.date}</p>
-                        <p>PLU Price: ${result.pluPrice.toFixed(2)} ${result.currency}</p>
-                        <p>Cashback: ${result.cashback.toFixed(2)} ${result.currency}</p>
-                        <p>PLU Reward: ${result.pluReward.toFixed(4)} PLU</p>
-                        <p>Reward Type: ${result.isPerk ? 'Perk' : 'Standard'}</p>
+                        <h3 class="transaction-title">Transaction ${index + 1}</h3>
+                        <div class="transaction-details">
+                            <p><strong>Amount:</strong> ${result.amount.toFixed(2)} ${result.currency}</p>
+                            <p><strong>Description:</strong> ${result.description}</p>
+                            <p><strong>Date:</strong> ${result.date.toLocaleDateString()}</p>
+                            <p><strong>PLU Price:</strong> ${result.pluPrice.toFixed(2)} ${result.currency}</p>
+                        </div>
+                        <div class="reward-details">
+                            <p><strong>Reward Type:</strong> ${result.isPerk ? 'Perk' : 'Standard'}</p>
+                            ${result.isPerk ? `
+                                <p><strong>Perk Cashback:</strong> ${result.perkCashback.toFixed(2)} ${result.currency}</p>
+                                <p><strong>Additional Cashback:</strong> ${result.standardCashback.toFixed(2)} ${result.currency}</p>
+                            ` : ''}
+                            <p><strong>Total Cashback:</strong> ${result.cashback.toFixed(2)} ${result.currency}</p>
+                            <p><strong>PLU Reward:</strong> ${result.pluReward.toFixed(4)} PLU</p>
+                        </div>
                     </div>
                 `;
             });
 
             const totalCashback = results.reduce((sum, result) => sum + result.cashback, 0);
             const totalPluReward = results.reduce((sum, result) => sum + result.pluReward, 0);
+            const totalPerkCashback = results.reduce((sum, result) => sum + result.perkCashback, 0);
+            const totalStandardCashback = results.reduce((sum, result) => sum + result.standardCashback, 0);
 
             html += `
                 <div class="result-summary">
-                    <h3>Summary</h3>
-                    <p>Total Cashback: ${totalCashback.toFixed(2)} ${results[0].currency}</p>
-                    <p>Total PLU Reward: ${totalPluReward.toFixed(4)} PLU</p>
+                    <h3 class="summary-title">Summary</h3>
+                    <p><strong>Total Cashback:</strong> ${totalCashback.toFixed(2)} ${results[0].currency}</p>
+                    ${totalPerkCashback > 0 ? `
+                        <p><strong>Total Perk Cashback:</strong> ${totalPerkCashback.toFixed(2)} ${results[0].currency}</p>
+                        <p><strong>Total Additional Cashback:</strong> ${totalStandardCashback.toFixed(2)} ${results[0].currency}</p>
+                    ` : ''}
+                    <p><strong>Total PLU Reward:</strong> ${totalPluReward.toFixed(4)} PLU</p>
                 </div>
             `;
 
