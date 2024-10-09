@@ -131,20 +131,12 @@
             // Sort perks by createdAt date in descending order
             perks.sort((a, b) => b.createdAt - a.createdAt);
 
-            // For today or future dates, return the most recent 'active' perks
-            if (checkDateUTC >= todayUTC) {
-                const activePerk = perks.find(perk => perk.status.toLowerCase() === 'active');
-                return activePerk ? activePerk.perks : [];
-            }
+            // Find the most recent perk entry that is not after the check date
+            const relevantPerk = perks.find(perk => perk.createdAt <= date);
 
-            // For past dates, find the applicable perk entry
-            for (let i = 0; i < perks.length; i++) {
-                const perkCreatedUTC = Date.UTC(perks[i].createdAt.getUTCFullYear(), perks[i].createdAt.getUTCMonth(), perks[i].createdAt.getUTCDate());
-                const perkUpdatedUTC = Date.UTC(perks[i].updatedAt.getUTCFullYear(), perks[i].updatedAt.getUTCMonth(), perks[i].updatedAt.getUTCDate());
-                
-                if (perkCreatedUTC <= checkDateUTC && perkUpdatedUTC >= checkDateUTC) {
-                    return perks[i].perks;
-                }
+            // If a relevant perk is found, return its perks
+            if (relevantPerk) {
+                return relevantPerk.perks;
             }
 
             // If no perks found for the given date
