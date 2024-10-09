@@ -72,14 +72,16 @@
                 const balance = await getTokenBalance(walletAddress);
                 const transactions = await getTokenTransactions(walletAddress);
                 const receivedFromWithdrawal = calculateReceivedFromWithdrawal(transactions);
-                const exitedPLU = calculateExitedPLU(transactions, walletAddress);
+                const soldPLU = calculateExitedPLU(transactions, walletAddress);
+                const percentageSold = (soldPLU / receivedFromWithdrawal) * 100;
 
                 resultDiv.innerHTML = `
                     <h2>Wallet Analysis Results:</h2>
                     <p>Wallet Address: ${walletAddress}</p>
                     <p>Current PLU Balance: ${balance.toFixed(2)} PLU</p>
                     <p>Total PLU Received from Withdrawal Wallet: ${receivedFromWithdrawal.toFixed(2)} PLU</p>
-                    <p>Total PLU Exited (excluding redemptions): ${exitedPLU.toFixed(2)} PLU</p>
+                    <p>Total PLU Sold (excluding redemptions): ${soldPLU.toFixed(2)} PLU</p>
+                    <p>Percentage of Received PLU Sold: ${percentageSold.toFixed(2)}%</p>
                 `;
             } catch (error) {
                 resultDiv.innerHTML = `Error: ${error.message}`;
