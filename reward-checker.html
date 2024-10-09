@@ -70,14 +70,18 @@
         function parseTransactionData(input) {
             return input.trim().split('\n').map(line => {
                 const fields = line.split('\t');
-                if (fields.length < 12) {
+                if (fields.length < 16) {
                     throw new Error('Invalid transaction data format. Please check your input.');
                 }
+                const dateTimeString = fields[15];
+                const [datePart, timePart] = dateTimeString.split(' ');
+                const [day, month, year] = datePart.split('/');
+                const date = new Date(Date.UTC(year, month - 1, day)); // Create date in UTC
                 return {
                     amount: parseFloat(fields[5]),
                     currency: fields[6],
                     description: fields[9],
-                    date: fields[11]
+                    date: date
                 };
             });
         }
@@ -88,13 +92,12 @@
             return { ...transaction, pluPrice, ...reward, isPerk };
         }
 
-        async function getPluPrice(dateString, currency) {
-            const date = new Date(dateString);
-            const oneYearAgo = new Date();
-            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-
-            if (date <= oneYearAgo) {
-                throw new Error('Transaction date is more than one year old. Historical data is not available for dates older than one year.');
+        async function getPluPrice(date, currency) {
+            const now = new Date();
+            
+            if (date > now) {
+                console.warn(`Transaction date ${date.toISOString()} is in the future. Using today's price.`);
+                return await fetchCurrentPluPrice(currency);
             }
 
             return await fetchHistoricalPluPrice(date, currency);
@@ -107,12 +110,17 @@
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
+                    if (response.status === 400) {
+                        console.warn(`No data available for ${formattedDate}. Fetching most recent data.`);
+                        return await fetchCurrentPluPrice(currency);
+                    }
                     const errorText = await response.text();
                     throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
                 }
                 const data = await response.json();
                 if (!data.market_data || !data.market_data.current_price) {
-                    throw new Error(`No price data available for ${formattedDate}`);
+                    console.warn(`No price data available for ${formattedDate}. Fetching most recent data.`);
+                    return await fetchCurrentPluPrice(currency);
                 }
                 const price = data.market_data.current_price[currency.toLowerCase()];
                 if (!price) {
@@ -126,10 +134,22 @@
         }
 
         function formatDate(date) {
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}-${month}-${year}`;
+            return `${date.getUTCDate().toString().padStart(2, '0')}-${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCFullYear()}`;
+        }
+
+        async function fetchCurrentPluPrice(currency) {
+            const url = `https://api.coingecko.com/api/v3/simple/price?ids=pluton&vs_currencies=${currency.toLowerCase()}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.pluton[currency.toLowerCase()];
+            } catch (error) {
+                console.error('Error fetching current PLU price:', error);
+                throw new Error(`Failed to fetch current PLU price: ${error.message}`);
+            }
         }
 
         function calculateReward(amount, pluPrice, isPerk, currency) {
