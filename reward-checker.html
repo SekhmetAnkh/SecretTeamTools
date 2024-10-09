@@ -167,7 +167,9 @@
                 cashback = standardCashback;
             }
             const pluReward = cashback / pluPrice;
-            return { cashback, perkCashback, standardCashback, pluReward };
+            const perkPluReward = perkCashback / pluPrice;
+            const standardPluReward = standardCashback / pluPrice;
+            return { cashback, perkCashback, standardCashback, pluReward, perkPluReward, standardPluReward };
         }
 
         function displayResults(results, resultDiv) {
@@ -185,11 +187,11 @@
                         <div class="reward-details">
                             <p><strong>Reward Type:</strong> ${result.isPerk ? 'Perk' : 'Standard'}</p>
                             ${result.isPerk ? `
-                                <p><strong>Perk Cashback:</strong> ${result.perkCashback.toFixed(2)} ${result.currency}</p>
-                                <p><strong>Additional Cashback:</strong> ${result.standardCashback.toFixed(2)} ${result.currency}</p>
+                                <p><strong>Perk Cashback:</strong> ${result.perkCashback.toFixed(2)} ${result.currency} (${result.perkPluReward.toFixed(4)} PLU)</p>
+                                <p><strong>Additional Cashback:</strong> ${result.standardCashback.toFixed(2)} ${result.currency} (${result.standardPluReward.toFixed(4)} PLU)</p>
                             ` : ''}
                             <p><strong>Total Cashback:</strong> ${result.cashback.toFixed(2)} ${result.currency}</p>
-                            <p><strong>PLU Reward:</strong> ${result.pluReward.toFixed(4)} PLU</p>
+                            <p><strong>Total PLU Reward:</strong> ${result.pluReward.toFixed(4)} PLU</p>
                         </div>
                     </div>
                 `;
@@ -199,14 +201,16 @@
             const totalPluReward = results.reduce((sum, result) => sum + result.pluReward, 0);
             const totalPerkCashback = results.reduce((sum, result) => sum + result.perkCashback, 0);
             const totalStandardCashback = results.reduce((sum, result) => sum + result.standardCashback, 0);
+            const totalPerkPluReward = results.reduce((sum, result) => sum + result.perkPluReward, 0);
+            const totalStandardPluReward = results.reduce((sum, result) => sum + result.standardPluReward, 0);
 
             html += `
                 <div class="result-summary">
                     <h3 class="summary-title">Summary</h3>
                     <p><strong>Total Cashback:</strong> ${totalCashback.toFixed(2)} ${results[0].currency}</p>
                     ${totalPerkCashback > 0 ? `
-                        <p><strong>Total Perk Cashback:</strong> ${totalPerkCashback.toFixed(2)} ${results[0].currency}</p>
-                        <p><strong>Total Additional Cashback:</strong> ${totalStandardCashback.toFixed(2)} ${results[0].currency}</p>
+                        <p><strong>Total Perk Cashback:</strong> ${totalPerkCashback.toFixed(2)} ${results[0].currency} (${totalPerkPluReward.toFixed(4)} PLU)</p>
+                        <p><strong>Total Additional Cashback:</strong> ${totalStandardCashback.toFixed(2)} ${results[0].currency} (${totalStandardPluReward.toFixed(4)} PLU)</p>
                     ` : ''}
                     <p><strong>Total PLU Reward:</strong> ${totalPluReward.toFixed(4)} PLU</p>
                 </div>
