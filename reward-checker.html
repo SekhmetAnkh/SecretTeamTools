@@ -30,38 +30,37 @@
 
         <div class="input-group">
             <label for="transaction-input">Transaction Data:</label>
-            <textarea id="transaction-input" rows="4" placeholder="Paste transaction data here..."></textarea>
+            <textarea id="transaction-input" rows="6" placeholder="Paste transaction data here (one transaction per line)..."></textarea>
         </div>
         <div class="input-group">
-            <button onclick="checkReward()">Calculate Reward</button>
+            <label>
+                <input type="checkbox" id="is-perk" />
+                Is this a Perk reward? (100% cashback up to 10 EUR/GBP, then 3%)
+            </label>
         </div>
-        <div id="result"></div>
+        <div class="input-group">
+            <button onclick="checkRewards()" class="btn-primary">Calculate Rewards</button>
+        </div>
+        <div id="result" class="result-card"></div>
     </div>
 
     <script src="load-navbar.js"></script>
     <script src="theme-switch.js"></script>
     <script>
-        const CASHBACK_RATE = 0.03; // 3% cashback
+        const STANDARD_CASHBACK_RATE = 0.03; // 3% cashback
+        const PERK_CASHBACK_RATE = 1; // 100% cashback for Perk
+        const PERK_CASHBACK_LIMIT = 10; // 10 EUR/GBP limit for Perk
 
-        async function checkReward() {
+        async function checkRewards() {
             const transactionInput = document.getElementById('transaction-input').value;
+            const isPerk = document.getElementById('is-perk').checked;
             const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = 'Calculating reward...';
+            resultDiv.innerHTML = 'Calculating rewards...';
 
             try {
-                const transaction = parseTransactionData(transactionInput);
-                const pluPrice = await getPluPrice(transaction.date, transaction.currency);
-                const reward = calculateReward(transaction.amount, pluPrice);
-
-                resultDiv.innerHTML = `
-                    <h2>Reward Calculation Results:</h2>
-                    <p>Transaction Amount: ${transaction.amount} ${transaction.currency}</p>
-                    <p>Description: ${transaction.description}</p>
-                    <p>Date: ${transaction.date}</p>
-                    <p>PLU Price on ${transaction.date}: ${pluPrice.toFixed(2)} ${transaction.currency}</p>
-                    <p>Cashback: ${reward.cashback.toFixed(2)} ${transaction.currency}</p>
-                    <p>PLU Reward: ${reward.pluReward.toFixed(4)} PLU</p>
-                `;
+                const transactions = parseTransactionData(transactionInput);
+                const results = await Promise.all(transactions.map(transaction => processTransaction(transaction, isPerk)));
+                displayResults(results, resultDiv);
             } catch (error) {
                 resultDiv.innerHTML = `Error: ${error.message}`;
                 console.error('Full error details:', error);
@@ -69,16 +68,24 @@
         }
 
         function parseTransactionData(input) {
-            const fields = input.split('\t');
-            if (fields.length < 12) {
-                throw new Error('Invalid transaction data format. Please check your input.');
-            }
-            return {
-                amount: parseFloat(fields[5]),
-                currency: fields[6],
-                description: fields[9],
-                date: fields[11]
-            };
+            return input.trim().split('\n').map(line => {
+                const fields = line.split('\t');
+                if (fields.length < 12) {
+                    throw new Error('Invalid transaction data format. Please check your input.');
+                }
+                return {
+                    amount: parseFloat(fields[5]),
+                    currency: fields[6],
+                    description: fields[9],
+                    date: fields[11]
+                };
+            });
+        }
+
+        async function processTransaction(transaction, isPerk) {
+            const pluPrice = await getPluPrice(transaction.date, transaction.currency);
+            const reward = calculateReward(transaction.amount, pluPrice, isPerk, transaction.currency);
+            return { ...transaction, pluPrice, ...reward, isPerk };
         }
 
         async function getPluPrice(dateString, currency) {
@@ -125,10 +132,50 @@
             return `${day}-${month}-${year}`;
         }
 
-        function calculateReward(amount, pluPrice) {
-            const cashback = amount * CASHBACK_RATE;
+        function calculateReward(amount, pluPrice, isPerk, currency) {
+            let cashback;
+            if (isPerk) {
+                if (amount <= PERK_CASHBACK_LIMIT) {
+                    cashback = amount;
+                } else {
+                    cashback = PERK_CASHBACK_LIMIT + (amount - PERK_CASHBACK_LIMIT) * STANDARD_CASHBACK_RATE;
+                }
+            } else {
+                cashback = amount * STANDARD_CASHBACK_RATE;
+            }
             const pluReward = cashback / pluPrice;
             return { cashback, pluReward };
+        }
+
+        function displayResults(results, resultDiv) {
+            let html = '<h2>Reward Calculation Results:</h2>';
+            results.forEach((result, index) => {
+                html += `
+                    <div class="result-item">
+                        <h3>Transaction ${index + 1}</h3>
+                        <p>Amount: ${result.amount.toFixed(2)} ${result.currency}</p>
+                        <p>Description: ${result.description}</p>
+                        <p>Date: ${result.date}</p>
+                        <p>PLU Price: ${result.pluPrice.toFixed(2)} ${result.currency}</p>
+                        <p>Cashback: ${result.cashback.toFixed(2)} ${result.currency}</p>
+                        <p>PLU Reward: ${result.pluReward.toFixed(4)} PLU</p>
+                        <p>Reward Type: ${result.isPerk ? 'Perk' : 'Standard'}</p>
+                    </div>
+                `;
+            });
+
+            const totalCashback = results.reduce((sum, result) => sum + result.cashback, 0);
+            const totalPluReward = results.reduce((sum, result) => sum + result.pluReward, 0);
+
+            html += `
+                <div class="result-summary">
+                    <h3>Summary</h3>
+                    <p>Total Cashback: ${totalCashback.toFixed(2)} ${results[0].currency}</p>
+                    <p>Total PLU Reward: ${totalPluReward.toFixed(4)} PLU</p>
+                </div>
+            `;
+
+            resultDiv.innerHTML = html;
         }
     </script>
 </body>
