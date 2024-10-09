@@ -36,10 +36,18 @@
         .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px 10px;
+            height: 42px; /* Match the height of select boxes */
         }
         .checkbox-group input[type="checkbox"] {
             width: auto;
+            margin-right: 10px;
+        }
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-size: 16px;
         }
         .btn-primary {
             display: block;
@@ -101,9 +109,12 @@
                     <option value="50">Grandmaster</option>
                 </select>
             </div>
-            <div class="input-group checkbox-group">
-                <input type="checkbox" id="is-perk" />
-                <label for="is-perk">Is this a Perk reward? (100% cashback up to perk cap, then selected tier)</label>
+            <div class="input-group">
+                <label for="is-perk" style="visibility: hidden;">Perk Reward</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="is-perk" />
+                    <label for="is-perk">Is this a Perk reward?</label>
+                </div>
             </div>
         </div>
 
