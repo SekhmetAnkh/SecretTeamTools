@@ -47,18 +47,29 @@
         const ETHERSCAN_API_KEY = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH';
 
         function extractWalletAddress(input) {
+            console.log("Input received:", input);
+
             // Check if input is a valid Ethereum address
             if (/^0x[a-fA-F0-9]{40}$/.test(input)) {
+                console.log("Matched as Ethereum address");
                 return input;
             }
 
             // Try to extract address from Etherscan URL
-            const urlPattern = /(?:https?:\/\/)?(?:www\.)?etherscan\.io\/address\/([a-fA-F0-9]{40})(?:#.*)?/i;
-            const match = input.match(urlPattern);
-            if (match) {
-                return '0x' + match[1];
+            try {
+                const url = new URL(input);
+                if (url.hostname === 'etherscan.io' && url.pathname.startsWith('/address/')) {
+                    const address = url.pathname.split('/')[2];
+                    if (/^0x[a-fA-F0-9]{40}$/.test(address)) {
+                        console.log("Matched as Etherscan URL");
+                        return address;
+                    }
+                }
+            } catch (e) {
+                console.log("URL parsing failed:", e);
             }
 
+            console.log("No match found");
             throw new Error('Invalid input. Please enter a valid Ethereum address or Etherscan URL.');
         }
 
