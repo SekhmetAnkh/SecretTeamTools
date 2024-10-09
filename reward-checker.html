@@ -33,9 +33,21 @@
             <textarea id="transaction-input" rows="6" placeholder="Paste transaction data here (one transaction per line)..."></textarea>
         </div>
         <div class="input-group">
+            <label for="cashback-tier">Cashback Tier:</label>
+            <select id="cashback-tier">
+                <option value="0.03">3% (Starter)</option>
+                <option value="0.04">4% (Everyday)</option>
+                <option value="0.05">5% (Everyday Pro)</option>
+                <option value="0.06">6% (Investor)</option>
+                <option value="0.07">7% (Investor Plus)</option>
+                <option value="0.08">8% (Trader)</option>
+                <option value="0.09">9% (Trader Plus)</option>
+            </select>
+        </div>
+        <div class="input-group">
             <label>
                 <input type="checkbox" id="is-perk" />
-                Is this a Perk reward? (100% cashback up to 10 EUR/GBP, then 3%)
+                Is this a Perk reward? (100% cashback up to 10 EUR/GBP, then selected tier)
             </label>
         </div>
         <div class="input-group">
@@ -47,20 +59,20 @@
     <script src="load-navbar.js"></script>
     <script src="theme-switch.js"></script>
     <script>
-        const STANDARD_CASHBACK_RATE = 0.03; // 3% cashback
         const PERK_CASHBACK_RATE = 1; // 100% cashback for Perk
         const PERK_CASHBACK_LIMIT = 10; // 10 EUR/GBP limit for Perk
 
         async function checkRewards() {
             const transactionInput = document.getElementById('transaction-input').value;
             const isPerk = document.getElementById('is-perk').checked;
+            const cashbackTier = parseFloat(document.getElementById('cashback-tier').value);
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = 'Calculating rewards...';
 
             try {
                 const transactions = parseTransactionData(transactionInput);
-                const results = await Promise.all(transactions.map(transaction => processTransaction(transaction, isPerk)));
-                displayResults(results, resultDiv);
+                const results = await Promise.all(transactions.map(transaction => processTransaction(transaction, isPerk, cashbackTier)));
+                displayResults(results, resultDiv, cashbackTier);
             } catch (error) {
                 resultDiv.innerHTML = `Error: ${error.message}`;
                 console.error('Full error details:', error);
@@ -86,9 +98,9 @@
             });
         }
 
-        async function processTransaction(transaction, isPerk) {
+        async function processTransaction(transaction, isPerk, cashbackTier) {
             const pluPrice = await getPluPrice(transaction.date, transaction.currency);
-            const reward = calculateReward(transaction.amount, pluPrice, isPerk, transaction.currency);
+            const reward = calculateReward(transaction.amount, pluPrice, isPerk, cashbackTier, transaction.currency);
             return { ...transaction, pluPrice, ...reward, isPerk };
         }
 
@@ -152,18 +164,18 @@
             }
         }
 
-        function calculateReward(amount, pluPrice, isPerk, currency) {
+        function calculateReward(amount, pluPrice, isPerk, cashbackTier, currency) {
             let cashback, perkCashback = 0, standardCashback = 0;
             if (isPerk) {
                 if (amount <= PERK_CASHBACK_LIMIT) {
                     perkCashback = amount;
                 } else {
                     perkCashback = PERK_CASHBACK_LIMIT;
-                    standardCashback = (amount - PERK_CASHBACK_LIMIT) * STANDARD_CASHBACK_RATE;
+                    standardCashback = (amount - PERK_CASHBACK_LIMIT) * cashbackTier;
                 }
                 cashback = perkCashback + standardCashback;
             } else {
-                standardCashback = amount * STANDARD_CASHBACK_RATE;
+                standardCashback = amount * cashbackTier;
                 cashback = standardCashback;
             }
             const pluReward = cashback / pluPrice;
@@ -172,8 +184,9 @@
             return { cashback, perkCashback, standardCashback, pluReward, perkPluReward, standardPluReward };
         }
 
-        function displayResults(results, resultDiv) {
+        function displayResults(results, resultDiv, cashbackTier) {
             let html = '<h2 class="results-title">Reward Calculation Results</h2>';
+            html += `<p><strong>Cashback Tier:</strong> ${(cashbackTier * 100).toFixed(0)}%</p>`;
             results.forEach((result, index) => {
                 html += `
                     <div class="result-item">
