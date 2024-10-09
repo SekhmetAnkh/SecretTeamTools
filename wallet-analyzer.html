@@ -72,16 +72,27 @@
                 const balance = await getTokenBalance(walletAddress);
                 const transactions = await getTokenTransactions(walletAddress);
                 const receivedFromWithdrawal = calculateReceivedFromWithdrawal(transactions);
+                const exitedPLU = calculateExitedPLU(transactions, walletAddress);
 
                 resultDiv.innerHTML = `
                     <h2>Wallet Analysis Results:</h2>
                     <p>Wallet Address: ${walletAddress}</p>
                     <p>Current PLU Balance: ${balance.toFixed(2)} PLU</p>
                     <p>Total PLU Received from Withdrawal Wallet: ${receivedFromWithdrawal.toFixed(2)} PLU</p>
+                    <p>Total PLU Exited (excluding redemptions): ${exitedPLU.toFixed(2)} PLU</p>
                 `;
             } catch (error) {
                 resultDiv.innerHTML = `Error: ${error.message}`;
             }
+        }
+
+        function calculateExitedPLU(transactions, walletAddress) {
+            return transactions
+                .filter(tx => 
+                    tx.from.toLowerCase() === walletAddress.toLowerCase() && 
+                    tx.to.toLowerCase() !== REDEMPTION_WALLET.toLowerCase()
+                )
+                .reduce((total, tx) => total + tx.value, 0);
         }
 
         async function getTokenBalance(address) {
