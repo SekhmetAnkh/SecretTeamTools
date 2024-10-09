@@ -139,7 +139,10 @@
 
             // For past dates, find the applicable perk entry
             for (let i = 0; i < perks.length; i++) {
-                if (perks[i].createdAt <= checkDateUTC && perks[i].updatedAt >= checkDateUTC) {
+                const perkCreatedUTC = Date.UTC(perks[i].createdAt.getUTCFullYear(), perks[i].createdAt.getUTCMonth(), perks[i].createdAt.getUTCDate());
+                const perkUpdatedUTC = Date.UTC(perks[i].updatedAt.getUTCFullYear(), perks[i].updatedAt.getUTCMonth(), perks[i].updatedAt.getUTCDate());
+                
+                if (perkCreatedUTC <= checkDateUTC && perkUpdatedUTC >= checkDateUTC) {
                     return perks[i].perks;
                 }
             }
