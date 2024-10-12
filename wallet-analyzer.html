@@ -45,6 +45,7 @@
         const WITHDRAWAL_WALLET = '0x4f78c6f32bd76124643ef32a2ab285be89ce1fcd';
         const REDEMPTION_WALLET = '0xE18F094DDd37f0eB2b651b65C4Aad080aFe90e51';
         const ETHERSCAN_API_KEY = 'USS41WYMMAIRJZ2EH8BDRV8G395CEU4GPH';
+        let exchangeWallets = [];
 
         function extractWalletAddress(input) {
             console.log("Input received:", input);
@@ -80,32 +81,45 @@
 
             try {
                 const walletAddress = extractWalletAddress(walletInput);
+                await fetchExchangeWallets();
                 const balance = await getTokenBalance(walletAddress);
                 const transactions = await getTokenTransactions(walletAddress);
                 const receivedFromWithdrawal = calculateReceivedFromWithdrawal(transactions);
-                const soldPLU = calculateExitedPLU(transactions, walletAddress);
-                const percentageSold = (soldPLU / receivedFromWithdrawal) * 100;
+                const totalReceived = calculateTotalReceived(transactions);
+                const soldPLU = await calculateExitedPLU(transactions, walletAddress);
+                const redeemedPLU = calculateRedeemedPLU(transactions, walletAddress);
+                const otherOutgoingPLU = calculateOtherOutgoingPLU(transactions, walletAddress);
+                const percentageSold = (soldPLU / totalReceived) * 100;
+                const percentageRedeemed = (redeemedPLU / totalReceived) * 100;
+                const percentageOtherOutgoing = (otherOutgoingPLU / totalReceived) * 100;
 
                 resultDiv.innerHTML = `
                     <h2>Wallet Analysis Results:</h2>
                     <p>Wallet Address: ${walletAddress}</p>
                     <p>Current PLU Balance: ${balance.toFixed(2)} PLU</p>
-                    <p>Total PLU Received from Withdrawal Wallet: ${receivedFromWithdrawal.toFixed(2)} PLU</p>
-                    <p>Total PLU Sold (excluding redemptions): ${soldPLU.toFixed(2)} PLU</p>
-                    <p>Percentage of Received PLU Sold: ${percentageSold.toFixed(2)}%</p>
+                    <p>Total PLU Received: ${totalReceived.toFixed(2)} PLU</p>
+                    <p>PLU Received from Withdrawal Wallet: ${receivedFromWithdrawal.toFixed(2)} PLU</p>
+                    <p>Total PLU Sold to Exchanges: ${soldPLU.toFixed(2)} PLU (${percentageSold.toFixed(2)}%)</p>
+                    <p>Total PLU Redeemed: ${redeemedPLU.toFixed(2)} PLU (${percentageRedeemed.toFixed(2)}%)</p>
+                    <p>Total PLU Sent to Other Wallets: ${otherOutgoingPLU.toFixed(2)} PLU (${percentageOtherOutgoing.toFixed(2)}%)</p>
                 `;
             } catch (error) {
                 resultDiv.innerHTML = `Error: ${error.message}`;
             }
         }
 
-        function calculateExitedPLU(transactions, walletAddress) {
-            return transactions
-                .filter(tx => 
-                    tx.from.toLowerCase() === walletAddress.toLowerCase() && 
-                    tx.to.toLowerCase() !== REDEMPTION_WALLET.toLowerCase()
-                )
-                .reduce((total, tx) => total + tx.value, 0);
+        async function fetchExchangeWallets() {
+            const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${PLU_CONTRACT_ADDRESS}&startblock=0&endblock=99999999&sort=asc&apikey=${ETHERSCAN_API_KEY}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            const uniqueAddresses = new Set();
+            data.result.forEach(tx => {
+                uniqueAddresses.add(tx.from.toLowerCase());
+                uniqueAddresses.add(tx.to.toLowerCase());
+            });
+            
+            exchangeWallets = Array.from(uniqueAddresses);
         }
 
         async function getTokenBalance(address) {
@@ -129,6 +143,41 @@
         function calculateReceivedFromWithdrawal(transactions) {
             return transactions
                 .filter(tx => tx.from.toLowerCase() === WITHDRAWAL_WALLET.toLowerCase())
+                .reduce((total, tx) => total + tx.value, 0);
+        }
+
+        function calculateTotalReceived(transactions) {
+            return transactions
+                .filter(tx => tx.to.toLowerCase() !== REDEMPTION_WALLET.toLowerCase())
+                .reduce((total, tx) => total + tx.value, 0);
+        }
+
+        async function calculateExitedPLU(transactions, walletAddress) {
+            return transactions
+                .filter(tx => 
+                    tx.from.toLowerCase() === walletAddress.toLowerCase() && 
+                    exchangeWallets.includes(tx.to.toLowerCase()) &&
+                    tx.to.toLowerCase() !== REDEMPTION_WALLET.toLowerCase()
+                )
+                .reduce((total, tx) => total + tx.value, 0);
+        }
+
+        function calculateRedeemedPLU(transactions, walletAddress) {
+            return transactions
+                .filter(tx => 
+                    tx.from.toLowerCase() === walletAddress.toLowerCase() && 
+                    tx.to.toLowerCase() === REDEMPTION_WALLET.toLowerCase()
+                )
+                .reduce((total, tx) => total + tx.value, 0);
+        }
+
+        function calculateOtherOutgoingPLU(transactions, walletAddress) {
+            return transactions
+                .filter(tx => 
+                    tx.from.toLowerCase() === walletAddress.toLowerCase() && 
+                    !exchangeWallets.includes(tx.to.toLowerCase()) &&
+                    tx.to.toLowerCase() !== REDEMPTION_WALLET.toLowerCase()
+                )
                 .reduce((total, tx) => total + tx.value, 0);
         }
     </script>
