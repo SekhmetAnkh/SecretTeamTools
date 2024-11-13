@@ -3,8 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     navbarPlaceholder.innerHTML = `
         <div class="navbar">
             <a href="index.html">Home</a>
-            <a href="wallet-analyzer.html">Wallet Analyzer</a>
-            <a href="perk-checker.html">Perk Checker</a>
+                <a href="perk-checker.html">Perk Checker</a>
             <a href="reward-checker.html">Reward Checker</a>
         </div>
     `;
