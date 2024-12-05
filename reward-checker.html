@@ -150,17 +150,17 @@
         function parseTransactionData(input) {
             return input.trim().split('\n').map(line => {
                 const fields = line.split('\t');
-                if (fields.length < 12) {
+                if (fields.length < 13) {
                     throw new Error('Invalid transaction data format. Please check your input.');
                 }
-                const dateTimeString = fields[11];
+                const dateTimeString = fields[12];
                 const [datePart, timePart] = dateTimeString.split(' ');
                 const [day, month, year] = datePart.split('/');
                 const date = new Date(Date.UTC(year, month - 1, day)); // Create date in UTC
                 return {
-                    amount: parseFloat(fields[5]),
-                    currency: fields[6],
-                    description: fields[9],
+                    amount: parseFloat(fields[2]),
+                    currency: fields[3],
+                    description: fields[6],
                     date: date
                 };
             });
