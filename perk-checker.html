@@ -19,34 +19,28 @@
 <body>
     <div id="navbar-placeholder"></div>
 
-    <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="checkbox">
-            <input type="checkbox" id="checkbox" />
-            <div class="icon-container">
-                <i class="fas fa-sun"></i>
-                <i class="fas fa-moon"></i>
-            </div>
-        </label>
-    </div>
-
     <div class="container fade-in">
         <h1>Perk Checker</h1>
 
         <div class="input-group">
-            <label for="perk-list">Perk List (paste the entire list including headers):</label>
-            <textarea id="perk-list" rows="10" placeholder="Status&#9;Perks&#9;Created at&#9;Updated at&#10;expired&#9;eBay&#9;03/04/2022 19:28&#9;03/04/2022 19:28"></textarea>
+            <label for="perk-list">Perk List:</label>
+            <textarea id="perk-list" rows="6" placeholder="Paste perk list here (one perk per line)..."></textarea>
         </div>
-        <div class="input-group">
-            <label for="check-date">Check Date:</label>
-            <div class="date-input-wrapper">
-                <input type="text" id="check-date" placeholder="Select a date">
-                <i class="fas fa-calendar-alt"></i>
+
+        <div class="input-container">
+            <div class="input-group">
+                <label for="start-date">Start Date:</label>
+                <input type="text" id="start-date" placeholder="Select start date">
+            </div>
+            <div class="input-group">
+                <label for="end-date">End Date:</label>
+                <input type="text" id="end-date" placeholder="Select end date">
             </div>
         </div>
-        <div class="input-group">
-            <button onclick="checkPerks()" class="btn-primary">Check Perks</button>
-        </div>
-        <div id="result" class="result-card"></div>
+
+        <button class="btn-primary" onclick="analyzePerkList()">Analyze Perks</button>
+
+        <div id="result"></div>
     </div>
 
     <script src="load-navbar.js"></script>
@@ -54,142 +48,51 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             loadNavbar();
-
-            const checkbox = document.getElementById('checkbox');
-            if (localStorage.getItem('theme') === 'dark') {
-                checkbox.checked = true;
-            }
-
-            checkbox.addEventListener('change', function() {
-                if (checkbox.checked) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    document.documentElement.removeAttribute('data-theme');
-                    localStorage.setItem('theme', 'light');
-                }
+            
+            // Initialize flatpickr for date inputs
+            flatpickr("#start-date", {
+                enableTime: false,
+                dateFormat: "Y-m-d"
+            });
+            
+            flatpickr("#end-date", {
+                enableTime: false,
+                dateFormat: "Y-m-d"
             });
         });
 
-        // Initialize Flatpickr
-        flatpickr("#check-date", {
-            dateFormat: "Y-m-d",
-            maxDate: "today",
-            allowInput: true,
-        });
-
-        function checkPerks() {
-            const perkListInput = document.getElementById('perk-list').value;
-            const checkDateInput = document.getElementById('check-date').value;
-            const resultDiv = document.getElementById('result');
-
-            if (!checkDateInput) {
-                resultDiv.innerHTML = 'Please enter a valid date.';
+        function analyzePerkList() {
+            const perkList = document.getElementById('perk-list').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
+            if (!perkList || !startDate || !endDate) {
+                alert('Please fill in all fields');
                 return;
             }
 
-            const [year, month, day] = checkDateInput.split('-');
-            const checkDate = new Date(Date.UTC(year, month - 1, day));
+            // Split the perk list into an array, removing empty lines
+            const perks = perkList.split('\n').filter(line => line.trim() !== '');
+            
+            // Calculate date difference
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const daysDifference = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
 
-            const perks = parsePerkList(perkListInput);
+            // Calculate results
+            const totalPerks = perks.length;
+            const perksPerDay = (totalPerks / daysDifference).toFixed(2);
 
-            try {
-                const activePerksOnDate = getActivePerks(perks, checkDate);
-                const activePerksToday = getActivePerks(perks, new Date());
-
-                displayResults(activePerksOnDate, activePerksToday, checkDate);
-            } catch (error) {
-                resultDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
-            }
-        }
-
-        function parsePerkList(input) {
-            const lines = input.trim().split('\n');
-            // Remove the header line
-            lines.shift();
-
-            return lines.map(line => {
-                const [status, perks, createdAt, updatedAt] = line.split('\t');
-                return {
-                    status,
-                    perks: perks.split(', ').filter(perk => perk.trim() !== ''),
-                    createdAt: parseDate(createdAt),
-                    updatedAt: parseDate(updatedAt)
-                };
-            });
-        }
-
-        function parseDate(dateString) {
-            if (!dateString) return null;
-            try {
-                const [datePart, timePart] = dateString.split(' ');
-                const [day, month, year] = datePart.split('/');
-                const [hours, minutes] = timePart ? timePart.split(':') : [0, 0];
-                // Create date in UTC to avoid timezone issues
-                return new Date(Date.UTC(
-                    parseInt(year, 10),
-                    parseInt(month, 10) - 1,
-                    parseInt(day, 10),
-                    parseInt(hours, 10),
-                    parseInt(minutes, 10)
-                ));
-            } catch (error) {
-                console.error(`Error parsing date: ${dateString}`, error);
-                return null;
-            }
-        }
-
-        function getActivePerks(perks, date) {
-            const now = new Date();
-            const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-            const checkDateUTC = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-
-            // If the date is in the future, return an error
-            if (checkDateUTC > todayUTC) {
-                throw new Error("Future date selected. Please choose a date in the past or today.");
-            }
-
-            // Sort perks by createdAt date in descending order
-            perks.sort((a, b) => b.createdAt - a.createdAt);
-
-            // Find the most recent perk entry that is not after the check date
-            const relevantPerk = perks.find(perk => perk.createdAt <= date);
-
-            // If a relevant perk is found, return its perks
-            if (relevantPerk) {
-                return relevantPerk.perks;
-            }
-
-            // If no perks found for the given date
-            return [];
-        }
-
-        function displayResults(activePerksOnDate, activePerksToday, checkDate) {
+            // Display results
             const resultDiv = document.getElementById('result');
-            const checkDateString = checkDate.toLocaleDateString('en-GB');
-            const todayString = new Date().toLocaleDateString('en-GB');
-
-            let resultHTML = `<h2>Active Perks on ${checkDateString}:</h2>`;
-            resultHTML += generatePerkList(activePerksOnDate);
-
-            if (checkDate.toDateString() !== new Date().toDateString()) {
-                resultHTML += `<h2>Active Perks Today (${todayString}):</h2>`;
-                resultHTML += generatePerkList(activePerksToday);
-            }
-
-            resultDiv.innerHTML = resultHTML;
-        }
-
-        function generatePerkList(perks) {
-            if (perks.length === 0) {
-                return '<p>No active perks found.</p>';
-            } else {
-                return `
-                    <ul>
-                        ${perks.map(perk => `<li>${perk}</li>`).join('')}
-                    </ul>
-                `;
-            }
+            resultDiv.innerHTML = `
+                <h2>Analysis Results</h2>
+                <p>Total Perks: ${totalPerks}</p>
+                <p>Date Range: ${daysDifference} days</p>
+                <p>Average Perks per Day: ${perksPerDay}</p>
+                <p>Start Date: ${startDate}</p>
+                <p>End Date: ${endDate}</p>
+            `;
         }
     </script>
 </body>
