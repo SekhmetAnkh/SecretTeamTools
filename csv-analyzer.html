@@ -47,10 +47,26 @@
                 /bon\s?cadeau/i, /cartão\s?presente/i, /cadeaubon/i, /geschenkkarte/i, /bono\s?regalo/i
             ];
             
+            const whitelist = [
+                /4259522/i, /airbnb/i, /albert\s?heijn/i, /aldi/i, /alpe\s?panon/i, /amazon/i, /amzn\s?mktp/i,
+                /amznmktplace/i, /amznprime/i, /apple\s?stores/i, /apple\.com/i, /applecom/i, /asda/i, /asos/i,
+                /avia/i, /bistro\.sk/i, /bk\s?1/i, /booking/i, /burger\s?king/i, /burgerking/i, /burguer\s?king/i,
+                /carref/i, /chatgpt/i, /coral/i, /curve\s?subscription/i, /deliveroo\s?plus/i, /dilu\s?red/i,
+                /disa/i, /disney\s?mobile/i, /disney\s?plus/i, /disneyplus/i, /ebay/i, /edeka/i, /goldengas/i,
+                /google\s?disney/i, /google\s?payment\s?ie\s?ltd\s?you/i, /hofer/i, /house\s?market\s?bg/i, /ikea/i,
+                /itunes/i, /just\s?eat/i, /just-eat/i, /justeat/i, /kentucky\s?fried/i, /kfc/i, /lenk\s?ohg/i,
+                /lidl/i, /lieferando/i, /london\s?transport/i, /macdonald/i, /mazon\s?prime/i, /mazon\.ca\s?prime/i,
+                /mazonprime/i, /mac\s?donald/i, /mc\s?donald/i, /mcd\s?forum/i, /mcdonald/i, /mercadona/i,
+                /michael\s?bruecken/i, /microsoft\*sub/i, /microsoft\*ultimate/i, /netflix/i, /onlyfans\.com/i,
+                /pingo\s?doce/i, /pingodoce/i, /playstation/i, /pmntsbveats/i, /premier\s?restaurant/i, /pyszne/i,
+                /reichelt/i, /rewe/i, /sainsbury/i, /sbx/i, /seutabeokseukolia/i, /shell/i, /spotify/i, /st1/i,
+                /starbuck/i, /steam\s?games/i, /steam\s?purchase/i, /steam\s?s/i, /steamgames/i, /takeaway/i,
+                /tesco/i, /tfl\s?travel/i, /thuisbezorgd/i, /twitter\s?paid\s?features/i, /uber/i, /uber\s?\*trip/i,
+                /uber\s?trip/i, /ubr/i, /uk\s?prime/i, /xbox/i, /youtub/i
+            ];
+            
             const amountThreshold = 50; // Example threshold for high-risk transactions
 
-            let totalAmount = 0;
-            let approvedCount = 0;
             let transactionCount = 0;
             let highRiskTransactions = 0;
             let potentialGiftCardPurchases = 0;
@@ -60,19 +76,15 @@
                 if (index === 0) return; // Skip header row
 
                 const amount = parseFloat(row[4]); // 'Amount' column
-                const approved = row[9] === 'TRUE'; // 'Approved' column
                 const mcc = parseInt(row[7]); // 'MCC' column
                 const description = row[6].toLowerCase(); // 'Description' column
 
-                if (!isNaN(amount)) {
-                    totalAmount += amount;
-                }
-
-                if (approved) {
-                    approvedCount++;
-                }
-
                 transactionCount++;
+
+                // Skip whitelisted transactions
+                if (whitelist.some(pattern => pattern.test(description))) {
+                    return;
+                }
 
                 // Check for high-risk MCC codes and amount threshold
                 if (highRiskMCCs.includes(mcc) && amount > amountThreshold) {
@@ -87,8 +99,6 @@
                 }
             });
 
-            const approvalRate = (approvedCount / transactionCount) * 100;
-
             let riskyTransactionsHTML = riskyTransactions.map(transaction => `
                 <tr>
                     <td>${transaction[4]}</td>
@@ -100,8 +110,6 @@
             `).join('');
 
             document.getElementById('output').innerHTML = `
-                <p>Total Amount: ${totalAmount.toFixed(2)}</p>
-                <p>Approval Rate: ${approvalRate.toFixed(2)}%</p>
                 <p>Total Transactions: ${transactionCount}</p>
                 <p>High-Risk Transactions: ${highRiskTransactions}</p>
                 <p>Potential Cashable Gift Card Purchases: ${potentialGiftCardPurchases}</p>
