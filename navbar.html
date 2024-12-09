@@ -3,41 +3,102 @@
     <a href="csv-analyzer.html">CSV Analyzer</a>
     <a href="perk-checker.html">Perk Checker</a>
     <a href="reward-checker.html">Rewards Checker</a>
-    <button id="darkModeToggle" class="dark-mode-toggle">Toggle Dark Mode</button>
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="icon-container">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-moon"></i>
+            </div>
+        </label>
+    </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        if (darkModeToggle) {
-            darkModeToggle.addEventListener('click', function() {
-                const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-                if (isDarkMode) {
-                    document.documentElement.removeAttribute('data-theme');
-                    localStorage.setItem('theme', 'light');
-                } else {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('theme', 'dark');
-                }
-            });
-
-            // Set initial theme based on localStorage
-            if (localStorage.getItem('theme') === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
+        const checkbox = document.getElementById('checkbox');
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            checkbox.checked = true;
         }
+
+        checkbox.addEventListener('change', function() {
+            if (checkbox.checked) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'light');
+            }
+        });
     });
 </script>
 
 <style>
-    .dark-mode-toggle {
-        background-color: #f0f0f0;
-        border: none;
-        padding: 10px;
-        cursor: pointer;
+    .theme-switch-wrapper {
+        display: flex;
+        align-items: center;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1001;
     }
-    [data-theme='dark'] .dark-mode-toggle {
-        background-color: #333;
-        color: #fff;
+
+    .theme-switch {
+        display: inline-block;
+        height: 34px;
+        position: relative;
+        width: 60px;
+    }
+
+    .theme-switch input {
+        display: none;
+    }
+
+    .icon-container {
+        background-color: #cbd5e0;
+        bottom: 0;
+        cursor: pointer;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .icon-container:before {
+        background-color: #fff;
+        bottom: 4px;
+        content: "";
+        height: 26px;
+        left: 4px;
+        position: absolute;
+        transition: .4s;
+        width: 26px;
+        border-radius: 50%;
+    }
+
+    input:checked + .icon-container {
+        background-color: #48bb78;
+    }
+
+    input:checked + .icon-container:before {
+        transform: translateX(26px);
+    }
+
+    .fa-sun, .fa-moon {
+        color: #f6ad55;
+        font-size: 18px;
+        position: absolute;
+        top: 8px;
+    }
+
+    .fa-sun {
+        left: 8px;
+    }
+
+    .fa-moon {
+        right: 8px;
     }
 </style>

@@ -1,31 +1,255 @@
-body[data-theme='dark'] {
-    background-color: #121212;
-    color: #ffffff;
+[data-theme='dark'] {
+    --bg-color: #1a202c; /* Darker background */
+    --text-color: #e2e8f0; /* Lighter text */
+    --input-bg: #2d3748; /* Darker input background */
+    --input-text: #e2e8f0; /* Lighter input text */
+    --button-bg: #4299e1; /* Keep button color consistent */
+    --button-text: #ffffff; /* Keep button text color consistent */
+    --accent-color: #48bb78; /* Keep accent color consistent */
+    --navbar-bg: #2d3748; /* Darker navbar background */
+    --navbar-text: #e2e8f0; /* Lighter navbar text */
+    --navbar-hover-bg: #4a5568; /* Slightly lighter hover background */
+    --navbar-hover-text: #ffffff; /* Keep hover text color consistent */
+    --card-bg: #2d3748; /* Darker card background */
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2); /* Darker shadow */
 }
 
-[data-theme='dark'] .container {
-    background-color: #1e1e1e;
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    transition: all 0.3s ease;
+    margin: 0;
+    padding: 20px;
+    padding-top: 70px;
 }
 
-[data-theme='dark'] button, 
-[data-theme='dark'] input, 
-[data-theme='dark'] textarea, 
-[data-theme='dark'] select {
-    background-color: #333;
-    color: #fff;
-    border: 1px solid #555;
+.navbar {
+    background-color: var(--navbar-bg);
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-[data-theme='dark'] .navbar {
-    background-color: #1e1e1e;
-    color: #fff;
+.navbar a {
+    float: left;
+    display: block;
+    color: var(--navbar-text);
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
-[data-theme='dark'] .navbar a {
-    color: #fff;
+.navbar a:hover {
+    background-color: var(--navbar-hover-bg);
+    color: var(--navbar-hover-text);
 }
 
-[data-theme='dark'] .dark-mode-toggle {
-    background-color: #333;
-    color: #fff;
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+h1, h2 {
+    color: var(--accent-color);
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--input-text);
+    border-radius: 4px;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--navbar-hover-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.fade-in {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1001;
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 34px;
+    position: relative;
+    width: 60px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.icon-container {
+    background-color: #cbd5e0;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.icon-container:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 26px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 26px;
+    border-radius: 50%;
+}
+
+input:checked + .icon-container {
+    background-color: #48bb78;
+}
+
+input:checked + .icon-container:before {
+    transform: translateX(26px);
+}
+
+.fa-sun, .fa-moon {
+    color: #f6ad55;
+    font-size: 18px;
+    position: absolute;
+    top: 8px;
+}
+
+.fa-sun {
+    left: 8px;
+}
+
+.fa-moon {
+    right: 8px;
+}
+
+/* Card styles for index page */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+}
+
+.card h3 {
+    color: var(--accent-color);
+    margin-top: 0;
+}
+
+.card p {
+    margin-bottom: 15px;
+}
+
+.card a {
+    display: inline-block;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.card a:hover {
+    background-color: var(--navbar-hover-bg);
+}
+
+/* Reward Checker specific styles */
+#transaction-input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#result {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--input-bg);
+    border-radius: 8px;
+    border: 1px solid var(--input-text);
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+}
+
+#result h2 {
+    margin-top: 0;
+    color: var(--accent-color);
 } 
