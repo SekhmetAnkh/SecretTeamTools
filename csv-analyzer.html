@@ -40,10 +40,11 @@
                 9311, 9399, 9402, 4816, 5947, 5965, 5966, 5967, 5969, 6513, 7392, 7399, 8999
             ];
             
-            const giftCardKeywords = [
-                'gift card', 'voucher', 'prepaid card', 'cash card', 'reloadable card',
-                'visa gift card', 'mastercard gift card', 'american express gift card',
-                'paypal', 'money transfer', 'cashback', 'rebate', 'money order'
+            const giftCardPatterns = [
+                /gift\s?card/i, /voucher/i, /prepaid\s?card/i, /cash\s?card/i, /reloadable\s?card/i,
+                /money\s?transfer/i, /cashback/i, /rebate/i, /money\s?order/i,
+                /cadeau/i, /gutschein/i, /tarjeta\s?regalo/i, /buono\s?regalo/i,
+                /bon\s?cadeau/i, /cartão\s?presente/i, /cadeaubon/i, /geschenkkarte/i, /bono\s?regalo/i
             ];
             
             let totalAmount = 0;
@@ -77,8 +78,8 @@
                     riskyTransactions.push(row);
                 }
 
-                // Check for potential cashable gift card purchases
-                if (giftCardKeywords.some(keyword => description.includes(keyword))) {
+                // Check for potential cashable gift card purchases using regex
+                if (giftCardPatterns.some(pattern => pattern.test(description))) {
                     potentialGiftCardPurchases++;
                     riskyTransactions.push(row);
                 }
@@ -93,7 +94,6 @@
                     <td>${transaction[2]}</td>
                     <td>${transaction[3]}</td>
                     <td>${transaction[4]}</td>
-                    <td>${transaction[5]}</td>
                     <td>${transaction[6]}</td>
                     <td>${transaction[7]}</td>
                     <td>${transaction[8]}</td>
@@ -118,7 +118,6 @@
                         <th>Last Name</th>
                         <th>Email</th>
                         <th>Amount</th>
-                        <th>Type</th>
                         <th>Description</th>
                         <th>MCC</th>
                         <th>Transaction Amount</th>
