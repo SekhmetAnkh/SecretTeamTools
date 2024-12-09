@@ -2,4 +2,29 @@
     <a href="index.html">Home</a>
     <a href="perk-checker.html">Perk Checker</a>
     <a href="#coming-soon">Reward Checker (Coming Soon)</a>
+    <button id="darkModeToggle" class="dark-mode-toggle">Toggle Dark Mode</button>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+            });
+        }
+    });
+</script>
+
+<style>
+    .dark-mode-toggle {
+        background-color: #f0f0f0;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+    }
+    body.dark-mode .dark-mode-toggle {
+        background-color: #333;
+        color: #fff;
+    }
+</style>
