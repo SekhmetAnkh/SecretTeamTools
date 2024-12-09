@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         // Immediately set the theme to prevent flash
         let theme = localStorage.getItem('theme');
@@ -28,8 +30,33 @@
         #csvFileInput, #startDate {
             margin-right: 10px;
             margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
         }
         
+        /* Button styles */
+        .btn-primary, .btn-secondary {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            background-color: #0056b3;
+        }
+
         /* Table styles */
         #output table {
             width: 100%;
@@ -57,10 +84,6 @@
             background-color: var(--navbar-hover-bg);
         }
         
-        .btn-primary {
-            margin-right: 10px;
-        }
-        
         #output {
             margin-top: 20px;
             padding: 20px;
@@ -79,9 +102,9 @@
         
         <div class="input-group">
             <input type="file" id="csvFileInput" accept=".csv" />
-            <input type="date" id="startDate" />
+            <input type="text" id="startDate" placeholder="Select start date" />
             <button id="analyzeButton" class="btn-primary">Analyze</button>
-            <button id="resetButton">Reset</button>
+            <button id="resetButton" class="btn-secondary">Reset</button>
         </div>
 
         <div id="output">
@@ -94,6 +117,12 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             loadNavbar();
+
+            // Initialize flatpickr for date input
+            flatpickr("#startDate", {
+                enableTime: false,
+                dateFormat: "Y-m-d"
+            });
 
             // Add click event listener for analyze button
             document.getElementById('analyzeButton').addEventListener('click', function() {
