@@ -6,13 +6,19 @@ function loadNavbar() {
             const darkModeToggle = document.getElementById('darkModeToggle');
             if (darkModeToggle) {
                 darkModeToggle.addEventListener('click', function() {
-                    document.body.classList.toggle('dark-mode');
-                    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+                    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+                    if (isDarkMode) {
+                        document.documentElement.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                    }
                 });
 
                 // Set initial theme based on localStorage
                 if (localStorage.getItem('theme') === 'dark') {
-                    document.body.classList.add('dark-mode');
+                    document.documentElement.setAttribute('data-theme', 'dark');
                 }
             }
         })
