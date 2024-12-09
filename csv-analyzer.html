@@ -67,7 +67,6 @@
             
             const amountThreshold = 50; // Example threshold for high-risk transactions
 
-            let transactionCount = 0;
             let highRiskTransactions = 0;
             let potentialGiftCardPurchases = 0;
             let riskyTransactions = [];
@@ -78,8 +77,6 @@
                 const amount = parseFloat(row[4]); // 'Amount' column
                 const mcc = parseInt(row[7]); // 'MCC' column
                 const description = row[6].toLowerCase(); // 'Description' column
-
-                transactionCount++;
 
                 // Skip whitelisted transactions
                 if (whitelist.some(pattern => pattern.test(description))) {
@@ -110,9 +107,6 @@
             `).join('');
 
             document.getElementById('output').innerHTML = `
-                <p>Total Transactions: ${transactionCount}</p>
-                <p>High-Risk Transactions: ${highRiskTransactions}</p>
-                <p>Potential Cashable Gift Card Purchases: ${potentialGiftCardPurchases}</p>
                 <h3>Risky Transactions:</h3>
                 <table border="1">
                     <tr>
