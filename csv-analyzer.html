@@ -47,6 +47,8 @@
                 /bon\s?cadeau/i, /cartão\s?presente/i, /cadeaubon/i, /geschenkkarte/i, /bono\s?regalo/i
             ];
             
+            const amountThreshold = 50; // Example threshold for high-risk transactions
+
             let totalAmount = 0;
             let approvedCount = 0;
             let transactionCount = 0;
@@ -72,8 +74,8 @@
 
                 transactionCount++;
 
-                // Check for high-risk MCC codes
-                if (highRiskMCCs.includes(mcc)) {
+                // Check for high-risk MCC codes and amount threshold
+                if (highRiskMCCs.includes(mcc) && amount > amountThreshold) {
                     highRiskTransactions++;
                     riskyTransactions.push(row);
                 }
