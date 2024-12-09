@@ -1,11 +1,14 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const navbarPlaceholder = document.getElementById('navbar-placeholder');
-    navbarPlaceholder.innerHTML = `
-        <div class="navbar">
-            <a href="index.html">Home</a>
-            <a href="perk-checker.html">Perk Checker</a>
-            <a href="reward-checker.html">Reward Checker</a>
-            <a href="csv-analyzer.html">CSV Analyzer</a>
-        </div>
-    `;
-});
+function loadNavbar() {
+    fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar-placeholder').innerHTML = data;
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('dark-mode');
+                });
+            }
+        })
+        .catch(error => console.error('Error loading navbar:', error));
+}
