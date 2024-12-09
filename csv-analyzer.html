@@ -34,7 +34,11 @@
         });
 
         function analyzeData(data) {
-            const highRiskMCCs = [4814, 5732, 5734, 5816]; // Example high-risk MCC codes
+            const highRiskMCCs = [
+                4829, 5933, 5972, 6010, 6011, 6012, 6051, 6211, 6540, 7995, 9223, 9406,
+                4812, 5094, 5411, 5541, 5734, 5815, 5817, 5818, 5944, 5999, 7311, 7372,
+                9311, 9399, 9402, 4816, 5947, 5965, 5966, 5967, 5969, 6513, 7392, 7399, 8999
+            ];
             let totalAmount = 0;
             let approvedCount = 0;
             let transactionCount = 0;
