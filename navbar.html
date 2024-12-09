@@ -1,7 +1,8 @@
 <div class="navbar">
     <a href="index.html">Home</a>
+    <a href="csv-analyzer.html">CSV Analyzer</a>
     <a href="perk-checker.html">Perk Checker</a>
-    <a href="#coming-soon">Reward Checker (Coming Soon)</a>
+    <a href="reward-checker.html">Rewards Checker</a>
     <button id="darkModeToggle" class="dark-mode-toggle">Toggle Dark Mode</button>
 </div>
 
@@ -11,7 +12,13 @@
         if (darkModeToggle) {
             darkModeToggle.addEventListener('click', function() {
                 document.body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
             });
+
+            // Set initial theme based on localStorage
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
         }
     });
 </script>

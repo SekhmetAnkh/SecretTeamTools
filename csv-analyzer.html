@@ -38,16 +38,7 @@
     <script src="load-navbar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Load the navbar
             loadNavbar();
-
-            // Add event listener for dark mode toggle
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            if (darkModeToggle) {
-                darkModeToggle.addEventListener('click', function() {
-                    document.body.classList.toggle('dark-mode');
-                });
-            }
         });
 
         document.getElementById('csvFileInput').addEventListener('change', function(event) {
