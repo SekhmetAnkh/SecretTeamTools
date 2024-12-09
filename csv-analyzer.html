@@ -53,6 +53,7 @@
 
     <script src="load-navbar.js"></script>
     <script src="theme-switch.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             loadNavbar();
@@ -64,8 +65,11 @@
                 if (file) {
                     Papa.parse(file, {
                         complete: function(results) {
+                            console.log('Parsed data:', results.data); // Log parsed data
                             analyzeData(results.data);
-                        }
+                        },
+                        header: true, // Assume the first row is the header
+                        skipEmptyLines: true // Skip empty lines
                     });
                 } else {
                     alert('Please select a CSV file first');
@@ -81,6 +85,11 @@
         });
 
         function analyzeData(data) {
+            if (!data || data.length === 0) {
+                alert('No data found in the CSV file.');
+                return;
+            }
+
             const highRiskMCCs = [
                 4829, 5933, 5972, 6010, 6011, 6012, 6211, 6540, 7995, 9223, 9406,
                 4812, 5094, 5411, 5541, 5734, 5815, 5817, 5818, 5944, 5999, 7311, 7372,
