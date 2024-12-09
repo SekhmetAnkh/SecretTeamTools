@@ -51,6 +51,7 @@
             let transactionCount = 0;
             let highRiskTransactions = 0;
             let potentialGiftCardPurchases = 0;
+            let riskyTransactions = [];
 
             data.forEach((row, index) => {
                 if (index === 0) return; // Skip header row
@@ -73,15 +74,35 @@
                 // Check for high-risk MCC codes
                 if (highRiskMCCs.includes(mcc)) {
                     highRiskTransactions++;
+                    riskyTransactions.push(row);
                 }
 
                 // Check for potential cashable gift card purchases
                 if (giftCardKeywords.some(keyword => description.includes(keyword))) {
                     potentialGiftCardPurchases++;
+                    riskyTransactions.push(row);
                 }
             });
 
             const approvalRate = (approvedCount / transactionCount) * 100;
+
+            let riskyTransactionsHTML = riskyTransactions.map(transaction => `
+                <tr>
+                    <td>${transaction[0]}</td>
+                    <td>${transaction[1]}</td>
+                    <td>${transaction[2]}</td>
+                    <td>${transaction[3]}</td>
+                    <td>${transaction[4]}</td>
+                    <td>${transaction[5]}</td>
+                    <td>${transaction[6]}</td>
+                    <td>${transaction[7]}</td>
+                    <td>${transaction[8]}</td>
+                    <td>${transaction[9]}</td>
+                    <td>${transaction[10]}</td>
+                    <td>${transaction[11]}</td>
+                    <td>${transaction[12]}</td>
+                </tr>
+            `).join('');
 
             document.getElementById('output').innerHTML = `
                 <p>Total Amount: ${totalAmount.toFixed(2)}</p>
@@ -89,6 +110,25 @@
                 <p>Total Transactions: ${transactionCount}</p>
                 <p>High-Risk Transactions: ${highRiskTransactions}</p>
                 <p>Potential Cashable Gift Card Purchases: ${potentialGiftCardPurchases}</p>
+                <h3>Risky Transactions:</h3>
+                <table border="1">
+                    <tr>
+                        <th>User ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>MCC</th>
+                        <th>Transaction Amount</th>
+                        <th>Approved</th>
+                        <th>Reference Type</th>
+                        <th>Reference ID</th>
+                        <th>Created at</th>
+                    </tr>
+                    ${riskyTransactionsHTML}
+                </table>
             `;
         }
     </script>
