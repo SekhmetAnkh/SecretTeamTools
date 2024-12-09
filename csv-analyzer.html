@@ -77,11 +77,16 @@
         <h1>CSV Analyzer</h1>
         <p>Upload a CSV file to analyze its contents.</p>
         
-        <input type="file" id="csvFileInput" accept=".csv" />
-        <input type="date" id="startDate" />
-        <button id="analyzeButton" class="btn-primary">Analyze</button>
-        <button id="resetButton">Reset</button>
-        <div id="output"></div>
+        <div class="input-group">
+            <input type="file" id="csvFileInput" accept=".csv" />
+            <input type="date" id="startDate" />
+            <button id="analyzeButton" class="btn-primary">Analyze</button>
+            <button id="resetButton">Reset</button>
+        </div>
+
+        <div id="output">
+            <!-- Results will be displayed here -->
+        </div>
     </div>
 
     <script src="load-navbar.js"></script>
@@ -121,6 +126,8 @@
                 alert('No data found in the CSV file.');
                 return;
             }
+
+            console.log('Analyzing data:', data); // Debug log
 
             const highRiskMCCs = [
                 4829, 5933, 5972, 6010, 6011, 6012, 6211, 6540, 7995, 9223, 9406,
@@ -165,10 +172,10 @@
             data.forEach((row, index) => {
                 if (index === 0) return; // Skip header row
 
-                const amount = parseFloat(row[4]); // 'Amount' column
-                const mcc = parseInt(row[7]); // 'MCC' column
-                const description = row[6].toLowerCase(); // 'Description' column
-                const transactionDate = new Date(row[12]); // 'Created at' column
+                const amount = parseFloat(row['Amount']); // 'Amount' column
+                const mcc = parseInt(row['MCC']); // 'MCC' column
+                const description = row['Description'].toLowerCase(); // 'Description' column
+                const transactionDate = new Date(row['Created at']); // 'Created at' column
 
                 // Skip transactions before the selected start date
                 if (startDate && transactionDate < startDate) {
@@ -193,13 +200,15 @@
                 }
             });
 
+            console.log('Risky Transactions:', riskyTransactions); // Debug log
+
             let riskyTransactionsHTML = riskyTransactions.map(transaction => `
                 <tr>
-                    <td>${transaction[4]}</td>
-                    <td>${transaction[6]}</td>
-                    <td>${transaction[7]}</td>
-                    <td>${transaction[8]}</td>
-                    <td>${transaction[12]}</td>
+                    <td>${transaction['Amount']}</td>
+                    <td>${transaction['Description']}</td>
+                    <td>${transaction['MCC']}</td>
+                    <td>${transaction['Transaction Amount']}</td>
+                    <td>${transaction['Created at']}</td>
                 </tr>
             `).join('');
 
