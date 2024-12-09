@@ -39,6 +39,13 @@
                 4812, 5094, 5411, 5541, 5734, 5815, 5817, 5818, 5944, 5999, 7311, 7372,
                 9311, 9399, 9402, 4816, 5947, 5965, 5966, 5967, 5969, 6513, 7392, 7399, 8999
             ];
+            
+            const giftCardKeywords = [
+                'gift card', 'voucher', 'prepaid card', 'cash card', 'reloadable card',
+                'visa gift card', 'mastercard gift card', 'american express gift card',
+                'paypal', 'money transfer', 'cashback', 'rebate', 'money order'
+            ];
+            
             let totalAmount = 0;
             let approvedCount = 0;
             let transactionCount = 0;
@@ -68,8 +75,8 @@
                     highRiskTransactions++;
                 }
 
-                // Check for potential gift card purchases
-                if (description.includes('gift card') || description.includes('voucher')) {
+                // Check for potential cashable gift card purchases
+                if (giftCardKeywords.some(keyword => description.includes(keyword))) {
                     potentialGiftCardPurchases++;
                 }
             });
@@ -81,7 +88,7 @@
                 <p>Approval Rate: ${approvalRate.toFixed(2)}%</p>
                 <p>Total Transactions: ${transactionCount}</p>
                 <p>High-Risk Transactions: ${highRiskTransactions}</p>
-                <p>Potential Gift Card Purchases: ${potentialGiftCardPurchases}</p>
+                <p>Potential Cashable Gift Card Purchases: ${potentialGiftCardPurchases}</p>
             `;
         }
     </script>
