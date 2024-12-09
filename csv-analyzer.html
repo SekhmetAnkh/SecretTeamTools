@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="container fade-in">
+        <h1>CSV Analyzer</h1>
+        <p>Upload a CSV file to analyze its contents.</p>
+        
+        <input type="file" id="csvFileInput" accept=".csv" />
+        <div id="output"></div>
+    </div>
+
+    <script src="load-navbar.js"></script>
+    <script>
+        document.getElementById('csvFileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                Papa.parse(file, {
+                    complete: function(results) {
+                        analyzeData(results.data);
+                    }
+                });
+            }
+        });
+
+        function analyzeData(data) {
+            const highRiskMCCs = [4814, 5732, 5734, 5816]; // Example high-risk MCC codes
+            let totalAmount = 0;
+            let approvedCount = 0;
+            let transactionCount = 0;
+            let highRiskTransactions = 0;
+            let potentialGiftCardPurchases = 0;
+
+            data.forEach((row, index) => {
+                if (index === 0) return; // Skip header row
+
+                const amount = parseFloat(row[4]); // 'Amount' column
+                const approved = row[9] === 'TRUE'; // 'Approved' column
+                const mcc = parseInt(row[7]); // 'MCC' column
+                const description = row[6].toLowerCase(); // 'Description' column
+
+                if (!isNaN(amount)) {
+                    totalAmount += amount;
+                }
+
+                if (approved) {
+                    approvedCount++;
+                }
+
+                transactionCount++;
+
+                // Check for high-risk MCC codes
+                if (highRiskMCCs.includes(mcc)) {
+                    highRiskTransactions++;
+                }
+
+                // Check for potential gift card purchases
+                if (description.includes('gift card') || description.includes('voucher')) {
+                    potentialGiftCardPurchases++;
+                }
+            });
+
+            const approvalRate = (approvedCount / transactionCount) * 100;
+
+            document.getElementById('output').innerHTML = `
+                <p>Total Amount: ${totalAmount.toFixed(2)}</p>
+                <p>Approval Rate: ${approvalRate.toFixed(2)}%</p>
+                <p>Total Transactions: ${transactionCount}</p>
+                <p>High-Risk Transactions: ${highRiskTransactions}</p>
+                <p>Potential Gift Card Purchases: ${potentialGiftCardPurchases}</p>
+            `;
+        }
+    </script>
+</body>
+</html> 
