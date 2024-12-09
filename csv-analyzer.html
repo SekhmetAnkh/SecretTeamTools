@@ -23,46 +23,38 @@
         
         <input type="file" id="csvFileInput" accept=".csv" />
         <input type="date" id="startDate" />
+        <button id="analyzeButton" class="btn-primary">Analyze</button>
         <button id="resetButton">Reset</button>
         <div id="output"></div>
     </div>
 
     <script src="load-navbar.js"></script>
+    <script src="theme-switch.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             loadNavbar();
 
-            const checkbox = document.getElementById('checkbox');
-            if (localStorage.getItem('theme') === 'dark') {
-                checkbox.checked = true;
-            }
-
-            checkbox.addEventListener('change', function() {
-                if (checkbox.checked) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('theme', 'dark');
+            // Add click event listener for analyze button
+            document.getElementById('analyzeButton').addEventListener('click', function() {
+                const fileInput = document.getElementById('csvFileInput');
+                const file = fileInput.files[0];
+                if (file) {
+                    Papa.parse(file, {
+                        complete: function(results) {
+                            analyzeData(results.data);
+                        }
+                    });
                 } else {
-                    document.documentElement.removeAttribute('data-theme');
-                    localStorage.setItem('theme', 'light');
+                    alert('Please select a CSV file first');
                 }
             });
-        });
 
-        document.getElementById('csvFileInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                Papa.parse(file, {
-                    complete: function(results) {
-                        analyzeData(results.data);
-                    }
-                });
-            }
-        });
-
-        document.getElementById('resetButton').addEventListener('click', function() {
-            document.getElementById('csvFileInput').value = '';
-            document.getElementById('startDate').value = '';
-            document.getElementById('output').innerHTML = '';
+            // Reset button functionality
+            document.getElementById('resetButton').addEventListener('click', function() {
+                document.getElementById('csvFileInput').value = '';
+                document.getElementById('startDate').value = '';
+                document.getElementById('output').innerHTML = '';
+            });
         });
 
         function analyzeData(data) {
