@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rewards Checker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="dark-mode.css">
-    <script>
-        // Immediately set the theme to prevent flash
-        let theme = localStorage.getItem('theme');
-        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-    </script>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Your Title</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+        <link rel="stylesheet" href="styles.css">
+        <script type="module" src="theme-switch.js"></script>
+        <script type="module" src="load-navbar.js"></script>
+    </head>
 <body>
     <div id="navbar-placeholder"></div>
 
@@ -112,7 +108,8 @@
                 const dateTimeString = fields[12];
                 const [datePart, timePart] = dateTimeString.split(' ');
                 const [day, month, year] = datePart.split('/');
-                const date = new Date(Date.UTC(year, month - 1, day)); // Create date in UTC
+                const fullYear = year.length === 2 ? '20' + year : year;
+                const date = new Date(Date.UTC(parseInt(fullYear), parseInt(month) - 1, parseInt(day)));
                 return {
                     amount: parseFloat(fields[2]),
                     currency: fields[3],

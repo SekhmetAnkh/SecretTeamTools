@@ -1,32 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perk Checker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="dark-mode.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script>
-        // Immediately set the theme to prevent flash
-        let theme = localStorage.getItem('theme');
-        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-    </script>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Perk Checker</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+        <link rel="stylesheet" href="styles.css">
+        <script type="module" src="theme-switch.js"></script>
+        <script type="module" src="load-navbar.js"></script>
+    </head>
 <body>
     <div id="navbar-placeholder"></div>
 
-    <div class="container fade-in">
+    <div class="container">
         <h1>Perk Checker</h1>
-
         <div class="input-group">
             <label for="perk-list">Perk List:</label>
             <textarea id="perk-list" rows="6" placeholder="Paste perk list here (one perk per line)..."></textarea>
         </div>
-
         <div class="input-container">
             <div class="input-group">
                 <label for="start-date">Start Date:</label>
@@ -37,63 +29,8 @@
                 <input type="text" id="end-date" placeholder="Select end date">
             </div>
         </div>
-
         <button class="btn-primary" onclick="analyzePerkList()">Analyze Perks</button>
-
         <div id="result"></div>
     </div>
-
-    <script src="load-navbar.js"></script>
-    <script src="theme-switch.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            loadNavbar();
-            
-            // Initialize flatpickr for date inputs
-            flatpickr("#start-date", {
-                enableTime: false,
-                dateFormat: "Y-m-d"
-            });
-            
-            flatpickr("#end-date", {
-                enableTime: false,
-                dateFormat: "Y-m-d"
-            });
-        });
-
-        function analyzePerkList() {
-            const perkList = document.getElementById('perk-list').value;
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
-            
-            if (!perkList || !startDate || !endDate) {
-                alert('Please fill in all fields');
-                return;
-            }
-
-            // Split the perk list into an array, removing empty lines
-            const perks = perkList.split('\n').filter(line => line.trim() !== '');
-            
-            // Calculate date difference
-            const start = new Date(startDate);
-            const end = new Date(endDate);
-            const daysDifference = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-
-            // Calculate results
-            const totalPerks = perks.length;
-            const perksPerDay = (totalPerks / daysDifference).toFixed(2);
-
-            // Display results
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = `
-                <h2>Analysis Results</h2>
-                <p>Total Perks: ${totalPerks}</p>
-                <p>Date Range: ${daysDifference} days</p>
-                <p>Average Perks per Day: ${perksPerDay}</p>
-                <p>Start Date: ${startDate}</p>
-                <p>End Date: ${endDate}</p>
-            `;
-        }
-    </script>
 </body>
 </html>
