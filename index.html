@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dark-mode.css">
     <script>
         // Immediately set the theme to prevent flash
         let theme = localStorage.getItem('theme');
@@ -47,6 +48,25 @@
     </div>
 
     <script src="load-navbar.js"></script>
-    <script src="theme-switch.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNavbar();
+
+            const checkbox = document.getElementById('checkbox');
+            if (localStorage.getItem('theme') === 'dark') {
+                checkbox.checked = true;
+            }
+
+            checkbox.addEventListener('change', function() {
+                if (checkbox.checked) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
