@@ -8,6 +8,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="dark-mode.css">
+    <style>
+        /* Add custom styles for the results table */
+        #output table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        #output th, #output td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #output th {
+            background-color: var(--navbar-bg);
+            color: var(--navbar-text);
+        }
+        #output tr:nth-child(even) {
+            background-color: var(--card-bg);
+        }
+        #output tr:hover {
+            background-color: var(--navbar-hover-bg);
+        }
+    </style>
     <script>
         // Immediately set the theme to prevent flash
         let theme = localStorage.getItem('theme');
@@ -141,7 +164,7 @@
 
             document.getElementById('output').innerHTML = `
                 <h3>Risky Transactions:</h3>
-                <table border="1">
+                <table>
                     <tr>
                         <th>Amount</th>
                         <th>Description</th>
