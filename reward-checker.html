@@ -100,16 +100,34 @@
         }
 
         function parseTransactionData(input) {
-            return input.trim().split('\n').map(line => {
-                const fields = line.split('\t');
-                if (fields.length < 13) {
-                    throw new Error('Invalid transaction data format. Please check your input.');
+            if (!input || !input.trim()) {
+                throw new Error('Please enter transaction data');
+            }
+
+            return input.trim().split('\n').map((line, index) => {
+                if (!line.trim()) {
+                    throw new Error(`Empty line found at position ${index + 1}`);
                 }
+
+                const fields = line.trim().split(/\s+/);
+                if (fields.length < 13) {
+                    throw new Error(`Invalid transaction data format at line ${index + 1}. Please check your input.`);
+                }
+
                 const dateTimeString = fields[12];
+                if (!dateTimeString) {
+                    throw new Error(`Missing date/time at line ${index + 1}`);
+                }
+
                 const [datePart, timePart] = dateTimeString.split(' ');
                 const [day, month, year] = datePart.split('/');
-                const fullYear = year.length === 2 ? '20' + year : year;
-                const date = new Date(Date.UTC(parseInt(fullYear), parseInt(month) - 1, parseInt(day)));
+                
+                const date = new Date(Date.UTC(
+                    parseInt(year),
+                    parseInt(month) - 1,
+                    parseInt(day)
+                ));
+
                 return {
                     amount: parseFloat(fields[2]),
                     currency: fields[3],
