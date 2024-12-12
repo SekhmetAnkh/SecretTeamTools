@@ -188,7 +188,22 @@ h1, p {
     </style>
 </head>
 <body>
-    <div id="navbar-placeholder"></div>
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="csv-analyzer.html">CSV Analyzer</a>
+        <a href="perk-checker.html">Perk Checker</a>
+        <a href="reward-checker.html">Rewards Checker</a>
+        <a href="refund-calculator.html">Refund Calculator</a>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="icon-container">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </div>
+            </label>
+        </div>
+    </div>
 
     <div class="container fade-in">
         <h1>CSV Analyzer</h1>
@@ -212,7 +227,6 @@ h1, p {
         </div>
     </div>
 
-    <script src="load-navbar.js"></script>
     <script src="theme-switch.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
