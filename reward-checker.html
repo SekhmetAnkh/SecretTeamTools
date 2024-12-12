@@ -113,25 +113,26 @@
                     throw new Error('Invalid transaction data format. Please check your input.');
                 }
                 const dateTimeString = fields[12];
-                console.log('Raw date string:', dateTimeString); // Debug log
 
+                // Split the date and time
                 const [datePart, timePart] = dateTimeString.split(' ');
+                
+                // Parse the date parts (assuming DD/MM/YYYY format)
                 const [day, month, year] = datePart.split('/');
-                const [hours, minutes] = timePart ? timePart.split(':') : [0, 0];
                 
-                console.log('Parsed components:', { day, month, year, hours, minutes }); // Debug log
-                
-                // Create UTC date with time components
-                const date = new Date(Date.UTC(
+                // Create the date object using the local timezone
+                const date = new Date(
                     parseInt(year),
                     parseInt(month) - 1,
-                    parseInt(day),
-                    parseInt(hours),
-                    parseInt(minutes)
-                ));
-                
-                console.log('Created date object:', date.toISOString()); // Debug log
-                
+                    parseInt(day)
+                );
+
+                // Add the time if it exists
+                if (timePart) {
+                    const [hours, minutes] = timePart.split(':');
+                    date.setHours(parseInt(hours), parseInt(minutes));
+                }
+
                 return {
                     amount: parseFloat(fields[2]),
                     currency: fields[3],
@@ -189,12 +190,10 @@
         }
 
         function formatDate(date) {
-            const day = date.getUTCDate().toString().padStart(2, '0');
-            const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-            const year = date.getUTCFullYear();
-            const formatted = `${day}-${month}-${year}`;
-            console.log('Formatted date for API:', formatted); // Debug log
-            return formatted;
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
         }
 
         async function fetchCurrentPluPrice(currency) {
