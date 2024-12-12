@@ -101,13 +101,15 @@
 
         // New function to process refund transactions
         async function processRefundTransaction(refund, originalTransaction, cashbackTier) {
-            // Use the original transaction's PLU price and date
+            const refundPercentage = Math.abs(refund.amount / originalTransaction.amount);
+            const pluToRemove = parseFloat((originalTransaction.pluReward * refundPercentage).toFixed(2));
+            
             return {
                 ...refund,
-                date: originalTransaction.date, // Keep original date for display
-                refundDate: refund.date, // Store refund date separately
-                pluPrice: originalTransaction.pluPrice,
-                ...calculateReward(refund.amount, originalTransaction.pluPrice, cashbackTier, refund.currency)
+                date: originalTransaction.date,
+                refundDate: refund.date,
+                refundPercentage,
+                pluReward: pluToRemove
             };
         }
 
@@ -139,11 +141,14 @@
                     throw new Error('Invalid transaction data format. Please check your input.');
                 }
                 const dateString = fields[fields.length - 1].split(' ')[0];
+                const pluReward = parseFloat(fields[10]) || 0;
+                
                 return {
                     amount: parseFloat(fields[2]),
                     currency: fields[3],
                     description: fields[6],
-                    date: dateString
+                    date: dateString,
+                    pluReward: pluReward
                 };
             });
         }
@@ -153,12 +158,12 @@
         }
 
         async function processTransaction(transaction, cashbackTier) {
-            const pluPrice = await getPluPrice(transaction.date, transaction.currency);
-            const reward = calculateReward(transaction.amount, pluPrice, cashbackTier, transaction.currency);
-            return { ...transaction, pluPrice, ...reward };
+            // No need to calculate reward as we have it from the data
+            return { 
+                ...transaction,
+                cashback: transaction.amount * cashbackTier
+            };
         }
-
-        // Reuse getPluPrice, fetchHistoricalPluPrice, fetchCurrentPluPrice, and calculateReward functions from reward-checker.html
 
         function displayRefundResults(originalResults, refundResults, resultDiv) {
             let html = '<h2 class="results-title">Refund Calculation Results</h2>';
@@ -171,9 +176,20 @@
         }
 
         function calculateNetResults(originalResults, refundResults) {
+            console.log('Original results:', originalResults); // Debug log
+            console.log('Refund results:', refundResults); // Debug log
+            
+            const totalOriginalPluReward = originalResults.reduce((sum, result) => sum + result.pluReward, 0);
+            const totalRefundPluReward = refundResults.reduce((sum, result) => sum + result.pluReward, 0);
+            const averageRefundPercentage = refundResults.reduce((sum, result) => sum + result.refundPercentage, 0) / refundResults.length;
+            
+            console.log('Total original PLU:', totalOriginalPluReward); // Debug log
+            console.log('Total refund PLU:', totalRefundPluReward); // Debug log
+            
             return {
-                originalPluReward: originalResults.reduce((sum, result) => sum + result.pluReward, 0),
-                refundPluReward: refundResults.reduce((sum, result) => sum + result.pluReward, 0)
+                originalPluReward: totalOriginalPluReward,
+                refundPluReward: totalRefundPluReward,
+                averageRefundPercentage
             };
         }
 
@@ -181,82 +197,12 @@
             return `
                 <div class="result-summary">
                     <div class="plu-results">
-                        <p><strong>Original PLU Reward:</strong> ${netResults.originalPluReward.toFixed(4)} PLU</p>
-                        <p><strong>PLU to Remove:</strong> ${netResults.refundPluReward.toFixed(4)} PLU</p>
+                        <p><strong>Original PLU Reward:</strong> ${netResults.originalPluReward.toFixed(2)} PLU</p>
+                        <p><strong>PLU to Remove:</strong> ${netResults.refundPluReward.toFixed(2)} PLU</p>
+                        <p><strong>Percentage of Original Transaction:</strong> ${(netResults.averageRefundPercentage * 100).toFixed(2)}%</p>
                     </div>
                 </div>
             `;
-        }
-
-        // Add these functions before calculateRefund()
-        async function getPluPrice(date, currency) {
-            const now = new Date();
-            
-            if (date > now) {
-                console.warn(`Transaction date ${date.toISOString()} is in the future. Using today's price.`);
-                return await fetchCurrentPluPrice(currency);
-            }
-
-            return await fetchHistoricalPluPrice(date, currency);
-        }
-
-        async function fetchHistoricalPluPrice(date, currency) {
-            const formattedDate = formatDate(date);
-            const url = `https://api.coingecko.com/api/v3/coins/pluton/history?date=${formattedDate}&localization=false`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    if (response.status === 400) {
-                        console.warn(`No data available for ${formattedDate}. Fetching most recent data.`);
-                        return await fetchCurrentPluPrice(currency);
-                    }
-                    const errorText = await response.text();
-                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
-                }
-                const data = await response.json();
-                if (!data.market_data || !data.market_data.current_price) {
-                    console.warn(`No price data available for ${formattedDate}. Fetching most recent data.`);
-                    return await fetchCurrentPluPrice(currency);
-                }
-                const price = data.market_data.current_price[currency.toLowerCase()];
-                if (!price) {
-                    throw new Error(`No price data available for ${currency} on ${formattedDate}`);
-                }
-                return price;
-            } catch (error) {
-                console.error('Error fetching historical PLU price:', error);
-                throw new Error(`Failed to fetch historical PLU price: ${error.message}`);
-            }
-        }
-
-        async function fetchCurrentPluPrice(currency) {
-            const url = `https://api.coingecko.com/api/v3/simple/price?ids=pluton&vs_currencies=${currency.toLowerCase()}`;
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                return data.pluton[currency.toLowerCase()];
-            } catch (error) {
-                console.error('Error fetching current PLU price:', error);
-                throw new Error(`Failed to fetch current PLU price: ${error.message}`);
-            }
-        }
-
-        // Add this function before calculateRefund()
-        function calculateReward(amount, pluPrice, cashbackTier, currency) {
-            // Calculate standard cashback
-            const cashback = amount * cashbackTier;
-            
-            // Convert cashback amount to PLU
-            const pluReward = cashback / pluPrice;
-            
-            return {
-                cashback,
-                pluReward
-            };
         }
     </script>
 </body>
