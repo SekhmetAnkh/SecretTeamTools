@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script>
+            // Immediately set theme to prevent flash
+            const theme = localStorage.getItem('theme');
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        </script>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Refund Calculator</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+<body>
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="csv-analyzer.html">CSV Analyzer</a>
+        <a href="perk-checker.html">Perk Checker</a>
+        <a href="reward-checker.html">Rewards Checker</a>
+        <a href="refund-calculator.html">Refund Calculator</a>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="icon-container">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </div>
+            </label>
+        </div>
+    </div>
+
+    <div class="container fade-in">
+        <h1>Refund Calculator</h1>
+
+        <div class="input-group">
+            <label for="original-transaction">Original Transaction Data:</label>
+            <textarea id="original-transaction" rows="6" placeholder="Paste original transaction data here (one transaction per line)..."></textarea>
+        </div>
+
+        <div class="input-group">
+            <label for="refund-transaction">Refund Transaction Data:</label>
+            <textarea id="refund-transaction" rows="6" placeholder="Paste refund transaction data here (one transaction per line)..."></textarea>
+        </div>
+
+        <div class="input-container">
+            <div class="input-group">
+                <label for="cashback-tier">Cashback Tier:</label>
+                <select id="cashback-tier">
+                    <option value="0.03">3%</option>
+                    <option value="0.04">4%</option>
+                    <option value="0.05">5%</option>
+                    <option value="0.06">6%</option>
+                    <option value="0.07">7%</option>
+                    <option value="0.08">8%</option>
+                    <option value="0.09">9%</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <button onclick="calculateRefund()" class="btn-primary">Calculate Refund</button>
+        </div>
+        <div id="result" class="result-card"></div>
+    </div>
+
+    <script src="theme-switch.js"></script>
+    <script>
+        async function calculateRefund() {
+            const originalInput = document.getElementById('original-transaction').value;
+            const refundInput = document.getElementById('refund-transaction').value;
+            const cashbackTier = parseFloat(document.getElementById('cashback-tier').value);
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Calculating refund...';
+
+            try {
+                const originalTransactions = parseTransactionData(originalInput);
+                const refundTransactions = parseTransactionData(refundInput);
+                
+                // First process original transactions to get their PLU prices
+                const originalResults = await Promise.all(originalTransactions.map(transaction => 
+                    processTransaction(transaction, cashbackTier)));
+                
+                // Process refunds using original transaction dates and PLU prices
+                const refundResults = await Promise.all(refundTransactions.map((refund, index) => {
+                    // Use the original transaction's date and PLU price for the refund calculation
+                    const originalTransaction = originalResults[index];
+                    return processRefundTransaction(refund, originalTransaction, cashbackTier);
+                }));
+                
+                displayRefundResults(originalResults, refundResults, resultDiv);
+            } catch (error) {
+                resultDiv.innerHTML = `Error: ${error.message}`;
+                console.error('Full error details:', error);
+            }
+        }
+
+        // New function to process refund transactions
+        async function processRefundTransaction(refund, originalTransaction, cashbackTier) {
+            // Use the original transaction's PLU price and date
+            return {
+                ...refund,
+                date: originalTransaction.date, // Keep original date for display
+                refundDate: refund.date, // Store refund date separately
+                pluPrice: originalTransaction.pluPrice,
+                ...calculateReward(refund.amount, originalTransaction.pluPrice, cashbackTier, refund.currency)
+            };
+        }
+
+        // Update the display function to show both dates for refunds
+        function generateTransactionHTML(result, index, isOriginal) {
+            return `
+                <div class="result-item">
+                    <h3 class="transaction-title">${isOriginal ? 'Original' : 'Refund'} Transaction ${index + 1}</h3>
+                    <div class="transaction-details">
+                        <p><strong>Amount:</strong> ${result.amount.toFixed(2)} ${result.currency}</p>
+                        <p><strong>Description:</strong> ${result.description}</p>
+                        <p><strong>Original Date:</strong> ${result.date}</p>
+                        ${!isOriginal ? `<p><strong>Refund Date:</strong> ${result.refundDate}</p>` : ''}
+                        <p><strong>PLU Price:</strong> ${result.pluPrice.toFixed(2)} ${result.currency}</p>
+                    </div>
+                    <div class="reward-details">
+                        <p><strong>Total Cashback:</strong> ${result.cashback.toFixed(2)} ${result.currency}</p>
+                        <p><strong>Total PLU Reward:</strong> ${result.pluReward.toFixed(4)} PLU</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Reuse these functions from reward-checker.html
+        function parseTransactionData(input) {
+            return input.trim().split('\n').map(line => {
+                const fields = line.split('\t');
+                if (fields.length < 13) {
+                    throw new Error('Invalid transaction data format. Please check your input.');
+                }
+                const dateString = fields[fields.length - 1].split(' ')[0];
+                return {
+                    amount: parseFloat(fields[2]),
+                    currency: fields[3],
+                    description: fields[6],
+                    date: dateString
+                };
+            });
+        }
+
+        function formatDate(dateString) {
+            return dateString.replace(/\//g, '-');
+        }
+
+        async function processTransaction(transaction, cashbackTier) {
+            const pluPrice = await getPluPrice(transaction.date, transaction.currency);
+            const reward = calculateReward(transaction.amount, pluPrice, cashbackTier, transaction.currency);
+            return { ...transaction, pluPrice, ...reward };
+        }
+
+        // Reuse getPluPrice, fetchHistoricalPluPrice, fetchCurrentPluPrice, and calculateReward functions from reward-checker.html
+
+        function displayRefundResults(originalResults, refundResults, resultDiv) {
+            let html = '<h2 class="results-title">Refund Calculation Results</h2>';
+            
+            // Calculate totals
+            const netResults = calculateNetResults(originalResults, refundResults);
+            html += generateSimplePLUResultHTML(netResults);
+
+            resultDiv.innerHTML = html;
+        }
+
+        function calculateNetResults(originalResults, refundResults) {
+            return {
+                originalPluReward: originalResults.reduce((sum, result) => sum + result.pluReward, 0),
+                refundPluReward: refundResults.reduce((sum, result) => sum + result.pluReward, 0)
+            };
+        }
+
+        function generateSimplePLUResultHTML(netResults) {
+            return `
+                <div class="result-summary">
+                    <div class="plu-results">
+                        <p><strong>Original PLU Reward:</strong> ${netResults.originalPluReward.toFixed(4)} PLU</p>
+                        <p><strong>PLU to Remove:</strong> ${netResults.refundPluReward.toFixed(4)} PLU</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Add these functions before calculateRefund()
+        async function getPluPrice(date, currency) {
+            const now = new Date();
+            
+            if (date > now) {
+                console.warn(`Transaction date ${date.toISOString()} is in the future. Using today's price.`);
+                return await fetchCurrentPluPrice(currency);
+            }
+
+            return await fetchHistoricalPluPrice(date, currency);
+        }
+
+        async function fetchHistoricalPluPrice(date, currency) {
+            const formattedDate = formatDate(date);
+            const url = `https://api.coingecko.com/api/v3/coins/pluton/history?date=${formattedDate}&localization=false`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    if (response.status === 400) {
+                        console.warn(`No data available for ${formattedDate}. Fetching most recent data.`);
+                        return await fetchCurrentPluPrice(currency);
+                    }
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+                }
+                const data = await response.json();
+                if (!data.market_data || !data.market_data.current_price) {
+                    console.warn(`No price data available for ${formattedDate}. Fetching most recent data.`);
+                    return await fetchCurrentPluPrice(currency);
+                }
+                const price = data.market_data.current_price[currency.toLowerCase()];
+                if (!price) {
+                    throw new Error(`No price data available for ${currency} on ${formattedDate}`);
+                }
+                return price;
+            } catch (error) {
+                console.error('Error fetching historical PLU price:', error);
+                throw new Error(`Failed to fetch historical PLU price: ${error.message}`);
+            }
+        }
+
+        async function fetchCurrentPluPrice(currency) {
+            const url = `https://api.coingecko.com/api/v3/simple/price?ids=pluton&vs_currencies=${currency.toLowerCase()}`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return data.pluton[currency.toLowerCase()];
+            } catch (error) {
+                console.error('Error fetching current PLU price:', error);
+                throw new Error(`Failed to fetch current PLU price: ${error.message}`);
+            }
+        }
+
+        // Add this function before calculateRefund()
+        function calculateReward(amount, pluPrice, cashbackTier, currency) {
+            // Calculate standard cashback
+            const cashback = amount * cashbackTier;
+            
+            // Convert cashback amount to PLU
+            const pluReward = cashback / pluPrice;
+            
+            return {
+                cashback,
+                pluReward
+            };
+        }
+    </script>
+</body>
+</html>
