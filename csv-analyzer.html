@@ -11,10 +11,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSV Analyzer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="dark-mode.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -61,42 +61,51 @@
 
         /* Table styles */
         #output table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: var(--card-bg);
-        }
-        
-        #output th, #output td {
-            border: 1px solid var(--text-color);
-            padding: 12px;
-            text-align: left;
-        }
-        
-        #output th {
-            background-color: var(--navbar-bg);
-            color: var(--navbar-text);
-        }
-        
-        #output tr:nth-child(even) {
-            background-color: var(--card-bg);
-        }
-        
-        #output tr:hover {
-            background-color: var(--navbar-hover-bg);
-        }
-        
-        #output {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            box-shadow: var(--card-shadow);
-        }
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+#output th, #output td {
+    border: 1px solid var(--input-text);
+    padding: 12px;
+    text-align: left;
+}
+
+#output th {
+    background-color: var(--navbar-bg);
+    color: var(--navbar-text);
+}
+
+#output tr:nth-child(even) {
+    background-color: var(--input-bg);
+}
+
+#output tr:hover {
+    background-color: var(--navbar-hover-bg);
+    color: var(--navbar-hover-text);
+}
     </style>
 </head>
 <body>
-    <div id="navbar-placeholder"></div>
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="csv-analyzer.html">CSV Analyzer</a>
+        <a href="perk-checker.html">Perk Checker</a>
+        <a href="reward-checker.html">Rewards Checker</a>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="icon-container">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </div>
+            </label>
+        </div>
+    </div>
 
     <div class="container fade-in">
         <h1>CSV Analyzer</h1>
@@ -114,44 +123,8 @@
         </div>
     </div>
 
-    <script src="load-navbar.js"></script>
     <script src="theme-switch.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            loadNavbar();
-
-            // Initialize flatpickr for date input
-            flatpickr("#startDate", {
-                enableTime: false,
-                dateFormat: "Y-m-d"
-            });
-
-            // Add click event listener for analyze button
-            document.getElementById('analyzeButton').addEventListener('click', function() {
-                const fileInput = document.getElementById('csvFileInput');
-                const file = fileInput.files[0];
-                if (file) {
-                    Papa.parse(file, {
-                        complete: function(results) {
-                            console.log('Parsed data:', results.data); // Log parsed data
-                            analyzeData(results.data);
-                        },
-                        header: true, // Assume the first row is the header
-                        skipEmptyLines: true // Skip empty lines
-                    });
-                } else {
-                    alert('Please select a CSV file first');
-                }
-            });
-
-            // Reset button functionality
-            document.getElementById('resetButton').addEventListener('click', function() {
-                document.getElementById('csvFileInput').value = '';
-                document.getElementById('startDate').value = '';
-                document.getElementById('output').innerHTML = '';
-            });
-        });
-
         function analyzeData(data) {
             if (!data || data.length === 0) {
                 alert('No data found in the CSV file.');
@@ -258,5 +231,6 @@
             `;
         }
     </script>
+    <script src="theme-switch.js"></script>
 </body>
-</html> 
+</html>

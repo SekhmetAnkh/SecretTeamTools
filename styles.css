@@ -12,6 +12,11 @@
     --navbar-hover-text: #ffffff;
     --card-bg: #ffffff;
     --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    --primary-color: #4299e1;
+    --secondary-color: #48bb78;
+    --transition-speed: 0.3s;
+    --border-radius: 8px;
+    --input-focus-shadow: 0 0 0 2px var(--accent-color);
 }
 
 [data-theme='dark'] {

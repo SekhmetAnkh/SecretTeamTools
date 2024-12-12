@@ -10,15 +10,27 @@
         </script>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Your Title</title>
+        <title>Rewards Checker</title>
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
         <link rel="stylesheet" href="styles.css">
-        <script type="module" src="theme-switch.js"></script>
-        <script type="module" src="load-navbar.js"></script>
     </head>
 <body>
-    <div id="navbar-placeholder"></div>
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="csv-analyzer.html">CSV Analyzer</a>
+        <a href="perk-checker.html">Perk Checker</a>
+        <a href="reward-checker.html">Rewards Checker</a>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="icon-container">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </div>
+            </label>
+        </div>
+    </div>
 
     <div class="container fade-in">
         <h1>Rewards Checker</h1>
@@ -65,27 +77,8 @@
         <div id="result" class="result-card"></div>
     </div>
 
-    <script src="load-navbar.js"></script>
+    <script src="theme-switch.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            loadNavbar();
-
-            const checkbox = document.getElementById('checkbox');
-            if (localStorage.getItem('theme') === 'dark') {
-                checkbox.checked = true;
-            }
-
-            checkbox.addEventListener('change', function() {
-                if (checkbox.checked) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    document.documentElement.removeAttribute('data-theme');
-                    localStorage.setItem('theme', 'light');
-                }
-            });
-        });
-
         const PERK_CASHBACK_RATE = 1; // 100% cashback for Perk
 
         async function checkRewards() {
@@ -262,5 +255,6 @@
             resultDiv.innerHTML = html;
         }
     </script>
+    <script src="theme-switch.js"></script>
 </body>
 </html>

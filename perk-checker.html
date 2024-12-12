@@ -14,11 +14,25 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
         <link rel="stylesheet" href="styles.css">
-        <script type="module" src="theme-switch.js"></script>
-        <script type="module" src="load-navbar.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     </head>
 <body>
-    <div id="navbar-placeholder"></div>
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="csv-analyzer.html">CSV Analyzer</a>
+        <a href="perk-checker.html">Perk Checker</a>
+        <a href="reward-checker.html">Rewards Checker</a>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="icon-container">
+                    <i class="fas fa-sun"></i>
+                    <i class="fas fa-moon"></i>
+                </div>
+            </label>
+        </div>
+    </div>
 
     <div class="container">
         <h1>Perk Checker</h1>
@@ -39,5 +53,26 @@
         <button class="btn-primary" onclick="analyzePerkList()">Analyze Perks</button>
         <div id="result"></div>
     </div>
+
+    <script src="theme-switch.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkbox = document.getElementById('checkbox');
+            if (localStorage.getItem('theme') === 'dark') {
+                checkbox.checked = true;
+            }
+
+            checkbox.addEventListener('change', function() {
+                if (checkbox.checked) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        });
+    </script>
+    <script src="theme-switch.js"></script>
 </body>
 </html>
