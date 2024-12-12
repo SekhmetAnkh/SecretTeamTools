@@ -115,12 +115,15 @@
                 const dateTimeString = fields[12];
                 const [datePart, timePart] = dateTimeString.split(' ');
                 const [day, month, year] = datePart.split('/');
+                const [hours, minutes] = timePart ? timePart.split(':') : [0, 0];
                 
-                // Convert year, month, and day to numbers and create UTC date
+                // Create UTC date with time components
                 const date = new Date(Date.UTC(
                     parseInt(year),
                     parseInt(month) - 1, // Months are 0-based in JavaScript
-                    parseInt(day)
+                    parseInt(day),
+                    parseInt(hours),
+                    parseInt(minutes)
                 ));
                 
                 return {
