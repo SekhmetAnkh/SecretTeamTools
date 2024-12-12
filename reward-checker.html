@@ -112,34 +112,22 @@
                 if (fields.length < 13) {
                     throw new Error('Invalid transaction data format. Please check your input.');
                 }
-                const dateTimeString = fields[12];
 
-                // Split the date and time
-                const [datePart, timePart] = dateTimeString.split(' ');
+                // Get just the date part before the space
+                const dateString = fields[12].split(' ')[0];
                 
-                // Parse the date parts (assuming DD/MM/YYYY format)
-                const [day, month, year] = datePart.split('/');
-                
-                // Create the date object using the local timezone
-                const date = new Date(
-                    parseInt(year),
-                    parseInt(month) - 1,
-                    parseInt(day)
-                );
-
-                // Add the time if it exists
-                if (timePart) {
-                    const [hours, minutes] = timePart.split(':');
-                    date.setHours(parseInt(hours), parseInt(minutes));
-                }
-
                 return {
                     amount: parseFloat(fields[2]),
                     currency: fields[3],
                     description: fields[6],
-                    date: date
+                    date: dateString  // Keep the date as a string in DD/MM/YYYY format
                 };
             });
+        }
+
+        function formatDate(dateString) {
+            // Convert from DD/MM/YYYY to DD-MM-YYYY
+            return dateString.replace(/\//g, '-');
         }
 
         async function processTransaction(transaction, isPerk, cashbackTier, perkCashbackLimit) {
@@ -187,13 +175,6 @@
                 console.error('Error fetching historical PLU price:', error);
                 throw new Error(`Failed to fetch historical PLU price: ${error.message}`);
             }
-        }
-
-        function formatDate(date) {
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}-${month}-${year}`;
         }
 
         async function fetchCurrentPluPrice(currency) {
