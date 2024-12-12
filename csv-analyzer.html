@@ -23,19 +23,54 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            text-align: center;
         }
         
         .input-group {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
-        #csvFileInput, #startDate {
-            margin-right: 10px;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        #csvFileInput {
+            width: 300px;
+            padding: 8px;
+            border: 1px solid var(--input-border);
             border-radius: 4px;
-            font-size: 16px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+        }
+        
+        #startDate {
+            width: 150px !important;
+            max-width: 150px !important;
+        }
+        
+        /* Style for file input container */
+        .file-input-container {
+            padding: 8px;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            width: 300px;
+            text-align: center;
         }
         
         /* Button styles */
@@ -49,6 +84,7 @@
             font-size: 16px;
             transition: background-color 0.3s ease;
             margin-right: 10px;
+            white-space: nowrap;
         }
 
         .btn-secondary {
@@ -88,35 +124,87 @@
     background-color: var(--navbar-hover-bg);
     color: var(--navbar-hover-text);
 }
+
+/* Add these new styles */
+.flatpickr-input {
+    width: 200px;
+    height: 38px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Add these styles to control the date picker size */
+.flatpickr-calendar {
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
+}
+
+.flatpickr-days {
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
+}
+
+.dayContainer {
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
+}
+
+/* Fix navbar visibility */
+.navbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--navbar-bg);
+    color: var(--navbar-text);
+    margin-bottom: 2rem;
+}
+
+.navbar a {
+    color: var(--navbar-text);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    border-radius: var(--border-radius);
+}
+
+.navbar a:hover {
+    background-color: var(--navbar-hover-bg);
+    color: var(--navbar-hover-text);
+}
+
+h1, p {
+    text-align: center;
+    margin-bottom: 1rem;
+}
     </style>
 </head>
 <body>
-    <div class="navbar">
-        <a href="index.html">Home</a>
-        <a href="csv-analyzer.html">CSV Analyzer</a>
-        <a href="perk-checker.html">Perk Checker</a>
-        <a href="reward-checker.html">Rewards Checker</a>
-        <a href="refund-calculator.html">Refund Calculator</a>
-        <div class="theme-switch-wrapper">
-            <label class="theme-switch" for="checkbox">
-                <input type="checkbox" id="checkbox" />
-                <div class="icon-container">
-                    <i class="fas fa-sun"></i>
-                    <i class="fas fa-moon"></i>
-                </div>
-            </label>
-        </div>
-    </div>
+    <div id="navbar-placeholder"></div>
 
     <div class="container fade-in">
         <h1>CSV Analyzer</h1>
         <p>Upload a CSV file to analyze its contents.</p>
         
         <div class="input-group">
-            <input type="file" id="csvFileInput" accept=".csv" />
-            <input type="text" id="startDate" placeholder="Select start date" />
-            <button id="analyzeButton" class="btn-primary">Analyze</button>
-            <button id="resetButton" class="btn-secondary">Reset</button>
+            <div class="input-row">
+                <div class="file-input-container">
+                    <input type="file" id="csvFileInput" accept=".csv" />
+                </div>
+                <input type="text" id="startDate" placeholder="Select start date" />
+            </div>
+            <div class="button-row">
+                <button id="analyzeButton" class="btn-primary">Analyze</button>
+                <button id="resetButton" class="btn-secondary">Reset</button>
+            </div>
         </div>
 
         <div id="output">
@@ -124,8 +212,19 @@
         </div>
     </div>
 
+    <script src="load-navbar.js"></script>
     <script src="theme-switch.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize flatpickr
+            flatpickr("#startDate", {
+                dateFormat: "Y-m-d",
+                allowInput: true,
+                altInput: true,
+                altFormat: "F j, Y"
+            });
+        });
+        
         function analyzeData(data) {
             if (!data || data.length === 0) {
                 alert('No data found in the CSV file.');
@@ -232,6 +331,5 @@
             `;
         }
     </script>
-    <script src="theme-switch.js"></script>
 </body>
-</html>
+</html> 
