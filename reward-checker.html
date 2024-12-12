@@ -113,8 +113,8 @@
                     throw new Error('Invalid transaction data format. Please check your input.');
                 }
 
-                // Get just the date part before the space
-                const dateString = fields[12].split(' ')[0];
+                // Get the last field which contains the date
+                const dateString = fields[fields.length - 1].split(' ')[0];
                 
                 return {
                     amount: parseFloat(fields[2]),
