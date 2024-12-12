@@ -183,7 +183,11 @@
         }
 
         function formatDate(date) {
-            return `${date.getUTCDate().toString().padStart(2, '0')}-${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-${date.getUTCFullYear()}`;
+            // Ensure we're working with UTC values
+            const day = date.getUTCDate().toString().padStart(2, '0');
+            const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+            const year = date.getUTCFullYear();
+            return `${day}-${month}-${year}`;
         }
 
         async function fetchCurrentPluPrice(currency) {
